@@ -2,20 +2,13 @@
 import json
 import numpy as np
 import traceback
-
-# 导入我们的模块
 from mcts.search import MCTS
-from utils.data_structures import AlphaNode, AlphaFormula
+from utils.data_structures import AlphaNode
 from agents.portrait_agent import PortraitAgent
 from agents.formula_agent import FormulaAgent
-# 修正：导入新的评估器
-from evaluation.evaluator import TutorEvaluator
+from evaluation.evaluator import simulate_evaluation
 from config import INITIAL_SEARCH_BUDGET, BUDGET_INCREMENT, EFFECTIVENESS_THRESHOLD
 from alpha_library.library import AlphaLibrary
-
-# 在全局初始化您的新评估器
-# 注意：请确保 evaluator.py 中的数据路径已正确配置
-evaluator = TutorEvaluator()
 
 
 def initialize_root_node() -> AlphaNode:
@@ -26,32 +19,23 @@ def initialize_root_node() -> AlphaNode:
     portrait_agent = PortraitAgent(prompt_path="prompts/portrait_generation.txt")
     formula_agent = FormulaAgent(prompt_path="prompts/formula_generation.txt")
 
-    while True:
-        root_portrait = portrait_agent.execute()
-        if not root_portrait:
-            print("生成初始Alpha画像失败，正在重试...")
-            continue
+    root_portrait = portrait_agent.execute()
+    if not root_portrait:
+        raise Exception("生成初始Alpha画像失败。")
 
-        root_formula = formula_agent.execute(alpha_portrait=root_portrait)
-        if not root_formula:
-            print("合成初始Alpha公式失败，正在重试...")
-            continue
+    root_formula = formula_agent.execute(alpha_portrait=root_portrait)
+    if not root_formula:
+        raise Exception("合成初始Alpha公式失败。")
 
-        root_node = AlphaNode(formula=root_formula, portrait=root_portrait)
+    root_node = AlphaNode(formula=root_formula, portrait=root_portrait)
 
-        # 使用真实数据评估器评估根节点
-        root_scores = evaluator.evaluate(root_formula, root_node)
+    root_scores = simulate_evaluation(root_formula, root_node)
+    root_node.scores = root_scores
+    root_node.q_value = np.mean(list(root_scores.values())) if root_scores else 0
 
-        if root_scores:
-            root_node.scores = root_scores
-            # 根节点的初始访问次数为1
-            root_node.visits = 1
-            root_node.q_value = np.mean(list(root_scores.values()))
-            print(f"根节点 '{root_node.portrait.get('name', '未命名')}' 已创建, Q值为: {root_node.q_value:.2f}")
-            print(f"各项得分: {json.dumps(root_scores, indent=2)}")
-            return root_node
-        else:
-            print("根节点评估失败，正在重新生成...")
+    print(f"根节点 '{root_node.portrait.get('name', '未命名')}' 已创建, Q值为: {root_node.q_value:.2f}")
+    print(f"各项得分: {json.dumps(root_scores, indent=2)}")
+    return root_node
 
 
 def run_search():
@@ -69,8 +53,7 @@ def run_search():
         print("-----------------\n")
         return
 
-    # 修正：在创建MCTS实例时传入新的评估器
-    mcts = MCTS(root=root_node, evaluator=evaluator)
+    mcts = MCTS(root=root_node)
     effective_alpha_repository = AlphaLibrary()
 
     if root_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD:
@@ -106,18 +89,16 @@ def run_search():
     print(f"\n--- 仓库中排名前 {len(best_alphas)} 的Alpha ---")
     for idx, alpha_data in enumerate(best_alphas):
         portrait = alpha_data.get('portrait', {})
-        formula_obj = alpha_data.get('formula')
-
+        formula = alpha_data.get('formula')
         print(f"{idx + 1}. 名称: {portrait.get('name', '未命名Alpha')}")
         print(f"   Q值: {alpha_data.get('q_value', 0):.4f}")
         print(f"   描述: {portrait.get('description', '无描述')}")
 
-        if formula_obj and isinstance(formula_obj, AlphaFormula):
+        if formula_obj and isinstance(formula_objm, AlphaFormula):
             expression_str = formula_obj.to_expression_string()
-            print(f"   公式: {expression_str}")
+            print(f"   公式：{expression_str}")
         else:
-            print("   公式无法解析。")
-
+            print(f"   公式步骤：{len(formula_obj.formula_steps) if formula_obj else 0} 步")
         print("-" * 25)
 
 

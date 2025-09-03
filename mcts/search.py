@@ -2,7 +2,7 @@
 import numpy as np
 from typing import Optional
 from utils.data_structures import AlphaNode, AlphaFormula
-from evaluation.evaluator import get_refinement_dimension, TutorEvaluator
+from evaluation.evaluator import simulate_evaluation, get_refinement_dimension
 from agents.refiner_agent import RefinerAgent
 from agents.formula_agent import FormulaAgent
 from config import MCTS_EXPLORATION_WEIGHT
@@ -16,10 +16,8 @@ class MCTS:
     为 Alpha 挖掘实现蒙特卡洛树搜索算法。
     """
 
-    # 修正：在初始化时接收 evaluator 实例
-    def __init__(self, root: AlphaNode, evaluator: TutorEvaluator):
+    def __init__(self, root: AlphaNode):
         self.root = root
-        self.evaluator = evaluator
 
     def _select_child(self, node: AlphaNode) -> Optional[AlphaNode]:
         """
@@ -31,11 +29,9 @@ class MCTS:
         uct_scores = []
         for child in node.children:
             if child.visits == 0:
-                # 优先选择从未访问过的节点
                 uct_scores.append(float('inf'))
                 continue
 
-            # UCT公式的利用项 + 探索项
             exploitation_term = child.q_value
             exploration_term = MCTS_EXPLORATION_WEIGHT * np.sqrt(
                 np.log(node.visits) / child.visits
@@ -50,9 +46,6 @@ class MCTS:
         """
         current_node = self.root
         while not current_node.is_leaf():
-            # 确保父节点访问次数大于0，避免log(0)错误
-            if current_node.visits == 0:
-                break
             selected_child = self._select_child(current_node)
             if selected_child is None:
                 break
@@ -90,14 +83,9 @@ class MCTS:
             refinement_summary=f"针对 {refinement_dim} 进行优化。新思路: {new_portrait.get('description', '无')}"
         )
 
-        # 修正：使用传入的evaluator实例进行评估
-        new_scores = self.evaluator.evaluate(new_formula, new_node)
-        if not new_scores:
-            print("新节点评估失败，跳过本次扩展。")
-            return None
-
+        new_scores = simulate_evaluation(new_formula, new_node)
         new_node.scores = new_scores
-        new_node.q_value = np.mean(list(new_scores.values()))
+        new_node.q_value = np.mean(list(new_scores.values())) if new_scores else 0.0
 
         node_to_expand.children.append(new_node)
         print(f"已创建新节点: '{new_node.portrait.get('name', '未命名')}', Q值为: {new_node.q_value:.2f}")
@@ -106,17 +94,18 @@ class MCTS:
     def backpropagate(self, node: AlphaNode):
         """
         将结果反向传播到根节点。
-        根据论文，Q值更新规则是取子树中的最大值。
         """
         current_node = node
-        new_score = node.q_value
-
+        path = []
         while current_node is not None:
-            current_node.visits += 1
-            # 更新Q值为其子树中出现过的最大分数
-            if new_score > current_node.q_value:
-                current_node.q_value = new_score
+            path.append(current_node)
+            current_node = current_node.parent
+
+        for node_in_path in path:
+            node_in_path.visits += 1
+            if node_in_path.children:
+                node_in_path.q_value = max([child.q_value for child in node_in_path.children])
 
             print(
-                f"反向传播至: '{current_node.portrait.get('name', '未命名')}', 新访问次数: {current_node.visits}, 新Q值: {current_node.q_value:.2f}")
-            current_node = current_node.parent
+                f"反向传播至: '{node_in_path.portrait.get('name', '未命名')}', 新访问次数: {node_in_path.visits}, 新Q值: {node_in_path.q_value:.2f}")
+

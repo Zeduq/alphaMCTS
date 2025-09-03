@@ -17,9 +17,9 @@ LLM_MODEL = "gpt-4o"
 
 # --- MCTS Configuration ---
 INITIAL_SEARCH_BUDGET = 3
-BUDGET_INCREMENT = backtest
+BUDGET_INCREMENT = 1
 MCTS_ITERATIONS = 50
-MCTS_EXPLORATION_WEIGHT = backtest.414
+MCTS_EXPLORATION_WEIGHT = 1.414
 
 # --- Evaluation Configuration ---
 EFFECTIVENESS_THRESHOLD = 7.0
@@ -30,7 +30,7 @@ EVALUATION_DIMENSIONS = [
     "Diversity",
     "Overfitting Risk"
 ]
-EVAL_TEMP = backtest.0
+EVAL_TEMP = 1.0
 MAX_EVAL_SCORE_PER_DIM = 10.0
 
 # --- Alpha Generation Configuration ---

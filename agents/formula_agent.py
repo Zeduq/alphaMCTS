@@ -35,5 +35,5 @@ class FormulaAgent(BaseAgent):
                 arguments=structured_formula_json['arguments']
             )
 
-        print("Formula Agent failed: LLM response was invalid or missing keys.")
+        print("Formula Agent failed: LLM回复格式非法或存在参数缺失")
         return None

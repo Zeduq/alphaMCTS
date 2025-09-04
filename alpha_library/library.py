@@ -1,10 +1,9 @@
-# alpha_library/library.py
 from typing import List, Dict, Any
 from utils.data_structures import AlphaNode
 
 class AlphaLibrary:
     """
-    一个简单的仓库，用于存储和管理在搜索过程中发现的有效的Alpha因子。
+    用于存储和管理在搜索过程中发现的有效的Alpha因子。
     """
     def __init__(self):
         self.alphas: List[Dict[str, Any]] = []

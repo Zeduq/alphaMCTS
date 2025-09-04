@@ -1,8 +1,6 @@
-# utils/data_structures.py
+import numpy as np
 from dataclasses import dataclass, field
-# 修正: 需要从 typing 导入 Dict, Any
 from typing import List, Dict, Any, Optional
-
 
 @dataclass
 class AlphaFormula:
@@ -63,9 +61,9 @@ class AlphaFormula:
 class AlphaNode:
     """
     代表MCTS搜索树中的一个节点。
+    此类已整合 MCTSNode 的功能。
     """
     formula: AlphaFormula
-    # 添加 portrait 属性以匹配其他文件中的用法
     portrait: Dict[str, Any]
     parent: Optional['AlphaNode'] = None
     children: List['AlphaNode'] = field(default_factory=list)
@@ -77,6 +75,28 @@ class AlphaNode:
     def is_leaf(self) -> bool:
         """检查节点是否为叶子节点（没有子节点）。"""
         return len(self.children) == 0
+
+    def calculate_uct(self, exploration_weight: float) -> float:
+        """
+        计算此节点的UCT分数。
+        父节点会使用这个分数来决定选择哪个子节点。
+        """
+        if self.visits == 0:
+            return float('inf')  # 优先探索未访问过的节点
+
+        # 利用项：节点的当前Q值
+        exploitation_term = self.q_value
+
+        # 探索项：鼓励访问探索次数较少的节点
+        if self.parent is None or self.parent.visits == 0:
+            # 对于子节点来说不应发生，但作为安全保障
+            return exploitation_term
+
+        exploration_term = exploration_weight * np.sqrt(
+            np.log(self.parent.visits) / self.visits
+        )
+
+        return exploitation_term + exploration_term
 
     def __repr__(self):
         # 使用 portrait 中的 name 以获得更有意义的表示

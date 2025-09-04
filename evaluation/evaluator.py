@@ -1,4 +1,3 @@
-# evaluation/evaluator.py
 import numpy as np
 import random
 from typing import Dict, List

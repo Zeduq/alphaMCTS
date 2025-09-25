@@ -1,0 +1,49 @@
+Task: Critical Alpha Overfitting Risk Assessment
+Critically evaluate the overfitting risk and generalization potential of the provided quantitative investment alpha, based on its expression and refinement history. Your assessment must focus on whether complexity and optimization appear justified or are likely signs of overfitting.
+
+Input:
+
+Alpha Expression:
+{alpha_formula}
+
+Refinement History:
+{refinement_history}
+
+Evaluation Criteria:
+
+Justified Rationale vs. Complexity:
+Critique: Is the complexity of the alpha expression plausibly justified by an inferred economic rationale, or does it seem arbitrary/excessive, suggesting fitting to noise?
+
+Principled Development vs. Data Dredging:
+Critique: Does the refinement history indicate hypothesis-driven improvements, or does it suggest excessive optimization and curve-fitting (e.g., frequent, unjustified parameter tweaks)?
+
+Transparency vs. Opacity:
+Critique: Is the alpha's logic reasonably interpretable despite its complexity, or is it opaque, potentially masking overfitting?
+
+Scoring & Output:
+
+Assign a single Overfitting Risk Score from 0 to 10.
+
+10 = Very Low Risk (High confidence in generalization)
+
+0 = Very High Risk (Low confidence in generalization)
+
+Use the full 0-10 range to differentiate risk levels effectively.
+
+Provide a concise, one-sentence Justification explaining the score, citing the key factors from the criteria.
+
+Format the output as JSON, like the examples below:
+
+Example JSON Outputs:
+{{
+"reason": "Complexity is justified by a strong rationale; principled refinement history suggests low risk.",
+"score": 9
+}}
+{{
+"reason": "Plausible rationale, but some expression opacity and parameter tuning in history indicate moderate risk.",
+"score": 5
+}}
+{{
+"reason": "High risk inferred from opaque expression lacking clear rationale, supported by history showing excessive tuning.",
+"score": 1
+}}

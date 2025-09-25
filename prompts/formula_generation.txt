@@ -1,0 +1,54 @@
+Task Description:
+Please design a quantitative investment alpha expression according to the following requirements.
+
+Available Data Fields:
+
+The following data fields are available for use: {available_fields}
+
+Available Operators:
+
+The following operators are available for use: {available_operators}
+
+Alpha Requirements:
+
+{alpha_portrait_prompt}
+
+Formatting Requirements:
+
+Provide the output in JSON format.
+
+The JSON object should contain two fields: "formula", and "arguments".
+
+"formula": Represents the mathematical expression for calculating the alpha.
+
+"arguments": Represents the configurable parameters of the alpha.
+
+"formula" is a list of dictionaries. Each dictionary represents a single operation and must contain four keys: "name", "param", "input", and "output".
+
+"name": The operator's name (a string), which MUST be one of the operators provided in the "Available Operators" section.
+
+"param": A list of strings, representing the parameter names for the operator. These parameter names MUST be used as keys in the "arguments" section.
+
+"input": A list of strings, representing the input variable names for the operator. These MUST be data fields from the "Available Data Fields" or output variables from previous operations in the "formula", cannot be of a numeric type.
+
+"output": A string, representing the output variable name for the operator. This output can be used as an input for subsequent operations.
+
+"arguments" is a list of dictionaries. Each dictionary represents a set of parameter values for the alpha.
+
+The keys of each dictionary in "arguments" MUST correspond exactly to the parameter names defined in the "param" lists of the "formula".
+
+The values in each dictionary in "arguments" are the specific numerical values for the parameters.
+
+You may include a maximum of 3 sets of parameters within the "arguments" field.
+
+The parameter value that indicates the length of the lookback window (if applicable) must be within the {window_range} range.
+
+Ensure that the alpha expression is both reasonable and computationally feasible.
+
+Parameter names should be descriptive and follow Python naming conventions (e.g., window_size, lag_period, smoothing_factor). Avoid using single characters or numbers as parameter names.
+
+Refer to the following example:
+{{
+"formula": [......],
+"arguments": [......]
+}}

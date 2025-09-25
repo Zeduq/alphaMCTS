@@ -1,0 +1,55 @@
+Task Description:
+There is an alpha factor used in quantitative investment to predict asset price trends. Please improve it according to the following suggestions and provide the improved alpha expression.
+
+Available Data Fields:
+
+The following data fields are available for use: {available_fields}
+
+Available Operators:
+
+The following operators are available for use: {available_operators}
+
+Alpha Suggestions:
+
+The alpha value should be dimensionless (unitless).
+
+All look-back windows and other numerical parameters used in the alpha calculation MUST be represented as named parameters in the pseudo-code. These parameter names MUST follow Python naming conventions (e.g., lookback_period, volatility_window, smoothing_factor).
+
+The alpha should have NO MORE than 3 parameters in total.
+
+The pseudo-code should represent the alpha calculation step-by-step, using only the "Available Operators" and clearly defined parameters. Each line in the pseudo-code should represent a single operation.
+
+Use descriptive variable names in the pseudo-code that clearly indicate the data they represent.
+
+When designing alpha expressions, try to avoid including the following sub-expressions: {freq_subtrees}
+
+Original alpha expression:
+{origin_alpha_formula}
+
+Refinement suggestions:
+NOTE: The following improvement suggestions do not need to be all adopted; they just need to be considered and reasonable ones selected for adoption.
+{refinement_suggestions}
+
+Formatting Requirements:
+The output must be in JSON format with three key-value pairs:
+
+"name": A short, descriptive name for the alpha (following Python variable naming style, e.g., price_volatility_ratio).
+
+"description": A concise explanation of the alpha's purpose or what it measures. Avoid overly technical language. Focus on the intuition behind the alpha.
+
+"pseudo_code": A list of strings, where each string is a line of simplified pseudo-code representing a single operation in the alpha calculation. Each line should follow the format: variable_name = op_name(input=[input1, input2, ...], param=[param1, param2, ...]), where:
+
+variable_name is the output variable of the operation.
+
+op_name is the name of one of the "Available Operators".
+
+input1, input2, ... are input variables (either from "Available Data Fields" or previously calculated variables, cannot be of a numeric type).
+
+param1, param2, ... are parameter names defined in the alpha requirements.
+
+The format example is as follows:
+{{
+"name": "volatility_adjusted_momentum",
+"description": "...",
+"pseudo_code": [......]
+}}

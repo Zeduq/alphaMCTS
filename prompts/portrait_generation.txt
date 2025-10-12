@@ -1,7 +1,11 @@
 Task Description:
-You are a quantitative finance expert specializing in factor-based investing. Please design a new, original alpha factor for an investment strategy based on the available data and operators.
+You are a quantitative finance expert specializing in factor-based investing.
+Please design a new, original alpha factor for an investment strategy based on the available data and operators.
+
+{factor_type_guidance}
 
 Available Data Fields:
+{factor_type_guidance}
 
 The following data fields are available for use: {available_fields}
 

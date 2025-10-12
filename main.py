@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import traceback
+from datetime import datetime
 from mcts.search import MCTS
 from utils.data_structures import AlphaNode, AlphaFormula
 from agents.portrait_agent import PortraitAgent
@@ -11,16 +12,17 @@ from alpha_library.library import AlphaLibrary
 from fsa.fsa_miner import mine_frequent_subtrees
 
 
-def initialize_root_node() -> AlphaNode:
+def initialize_root_node(factor_type: str) -> AlphaNode:
     """
     使用由Agent生成的第一个Alpha来初始化MCTS树的根节点。
     """
     print("--- 正在初始化根节点 ---")
+
     portrait_agent = PortraitAgent(prompt_path="prompts/portrait_generation.txt")
     formula_agent = FormulaAgent(prompt_path="prompts/formula_generation.txt")
 
     # 初始生成时，没有需要规避的子树
-    root_portrait = portrait_agent.execute(freq_subtrees=[])
+    root_portrait = portrait_agent.execute(freq_subtrees=[], factor_type=factor_type)
     if not root_portrait:
         raise Exception("生成初始Alpha画像失败。")
 
@@ -30,15 +32,14 @@ def initialize_root_node() -> AlphaNode:
 
     root_node = AlphaNode(formula=root_formula, portrait=root_portrait)
 
-    # 评估根节点时，传入一个空的AlphaLibrary实例，因为此时库里还没有任何因子
+    # 评估根节点时，传入一个空的AlphaLibrary实例
     root_scores = simulate_evaluation(root_formula, root_node, AlphaLibrary())
     root_node.scores = root_scores
     root_node.q_value = np.mean(list(root_scores.values())) if root_scores else 0
 
-    # 详细的打印输出 (同步您的改动)
+    # 详细的打印输出
     print("--- 根节点详细信息 ---")
     print(f"根节点 '{root_node.portrait.get('name', '未命名')}' 已创建, Q值为: {root_node.q_value:.2f}")
-    # 使用 to_expression_string() 获取可读的公式
     formula_str = root_node.formula.to_expression_string()
     print(f"  因子公式: {formula_str}")
     scores_str = json.dumps(root_node.scores, indent=4)
@@ -48,12 +49,18 @@ def initialize_root_node() -> AlphaNode:
     return root_node
 
 
-def run_search():
+def run_search(factor_type: str):
     """
     运行MCTS搜索过程的主函数。
     """
+    all_generated_nodes_data = []
+
     try:
-        root_node = initialize_root_node()
+        root_node = initialize_root_node(factor_type)
+        is_root_effective = root_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD
+        all_generated_nodes_data.append({
+            "node": root_node, "in_library": is_root_effective
+        })
     except Exception as e:
         print("\n--- 初始化过程中发生错误 ---")
         print(f"错误类型: {type(e).__name__}")
@@ -66,7 +73,7 @@ def run_search():
     mcts = MCTS(root=root_node)
     effective_alpha_repository = AlphaLibrary()
 
-    if root_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD:
+    if is_root_effective:
         effective_alpha_repository.add(root_node)
 
     max_score_overall = root_node.q_value
@@ -75,55 +82,86 @@ def run_search():
     i = 0
     while i < search_budget:
         print(f"\n{'=' * 20} MCTS 迭代: {i + 1}/{search_budget} {'=' * 20}")
-
         frequent_subtrees = mine_frequent_subtrees(effective_alpha_repository.alphas, top_k=3)
-
         node_to_expand = mcts.select()
-
         new_node = mcts.expand(node_to_expand, freq_subtrees=frequent_subtrees, alpha_repo=effective_alpha_repository)
-
         if new_node:
             mcts.backpropagate(new_node)
-
+            is_new_node_effective = new_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD
+            all_generated_nodes_data.append({
+                "node": new_node, "in_library": is_new_node_effective
+            })
             if new_node.q_value > max_score_overall:
                 max_score_overall = new_node.q_value
                 search_budget += BUDGET_INCREMENT
                 print(f"*** 发现新的最佳Alpha, Q值: {max_score_overall:.2f}。搜索预算增加至: {search_budget} ***")
-
-            if new_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD:
+            if is_new_node_effective:
                 effective_alpha_repository.add(new_node)
-
         i += 1
 
     print("\n\n--- MCTS 搜索完成 ---")
+    print(f"总共生成因子数: {len(all_generated_nodes_data)}")
     print(f"仓库中有效Alpha总数: {len(effective_alpha_repository)}")
+
+    with open("result.txt", "w", encoding="utf-8") as f:
+        run_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        f.write(f"==================== RUN START: {run_timestamp} ====================\n")
+        f.write(f"Factor Type: {factor_type}\n")
+        if not all_generated_nodes_data:
+            f.write("No alphas were generated in this run.\n")
+        for idx, data in enumerate(all_generated_nodes_data):
+            node = data["node"];
+            in_library = data["in_library"]
+            portrait = node.portrait;
+            formula_obj = node.formula;
+            scores = node.scores;
+            q_value = node.q_value
+            formula_str_val = formula_obj.to_expression_string() if isinstance(formula_obj, AlphaFormula) else "公式解析失败"
+            scores_json_str = json.dumps(scores)
+            f.write(f"--- Alpha {idx + 1} ---\n")
+            f.write(f"Name: {portrait.get('name', '未命名Alpha')}\n")
+            f.write(f"Q-Value: {q_value:.4f}\n")
+            f.write(f"In Library: {'Yes' if in_library else 'No'}\n")
+            f.write(f"Formula: {formula_str_val}\n")
+            f.write(f"Scores: {scores_json_str}\n")
+        f.write(f"==================== RUN END ====================\n\n")
+
+    print("\n所有生成因子的结果已追加到 result.txt 文件中。")
 
     best_alphas = effective_alpha_repository.get_best_alphas(n=10)
     print(f"\n--- 仓库中排名前 {len(best_alphas)} 的Alpha ---")
     for idx, alpha_data in enumerate(best_alphas):
         portrait = alpha_data.get('portrait', {})
         formula_obj = alpha_data.get('formula')
-
         scores = alpha_data.get('scores', {})
-        scores_str = json.dumps(scores, indent=4)
+        q_value = alpha_data.get('q_value', 0)
 
-        print(f"{idx + 1}. 名称: {portrait.get('name', '未命名Alpha')}")
-        print(f"   Q值: {alpha_data.get('q_value', 0):.4f}")
-        print(f"   描述: {portrait.get('description', '无描述')}")
+        name_str = f"{idx + 1}. 名称: {portrait.get('name', '未命名Alpha')}"
+        q_str = f"   Q值: {q_value:.4f}"
+        desc_str = f"   描述: {portrait.get('description', '无描述')}"
+        formula_str_val = formula_obj.to_expression_string() if isinstance(formula_obj, AlphaFormula) else "公式解析失败"
+        formula_str = f"   公式: {formula_str_val}"
+        scores_pretty_str = json.dumps(scores, indent=4)
+        scores_str = f"   五维得分:\n{scores_pretty_str}"
 
-        if formula_obj and isinstance(formula_obj, AlphaFormula):
-            expression_str = formula_obj.to_expression_string()
-            print(f"   公式: {expression_str}")
-        else:
-            # Fallback for older data structure if needed, though unlikely with current code
-            formula_steps_count = len(formula_obj.formula_steps) if formula_obj and hasattr(formula_obj,
-                                                                                            'formula_steps') else 0
-            print(f"   公式步骤: {formula_steps_count} 步")
-
-        # 打印格式化后的五维得分
-        print(f"   五维得分:\n{scores_str}")
+        print(name_str)
+        print(q_str)
+        print(desc_str)
+        print(formula_str)
+        print(scores_str)
         print("-" * 25)
 
 
 if __name__ == "__main__":
-    run_search()
+    factor_menu = {
+        "1": "动量因子", "2": "波动率因子", "3": "情绪/另类因子",
+        "4": "价值因子", "5": "质量因子",
+        "6": "成长因子", "7": "不指定类型"
+    }
+    print("请选择您想生成的初始Alpha因子类型:")
+    for key, value in factor_menu.items():
+        print(f"  {key}: {value}")
+    choice = input("请输入选项编号 (默认为7): ")
+    selected_type = factor_menu.get(choice, factor_menu["7"])
+    print(f"\n已选择生成: {selected_type}\n")
+    run_search(factor_type=selected_type)

@@ -68,7 +68,6 @@ def calculate_diversity_score(new_factor_values: pd.DataFrame, alpha_repo: Alpha
     return diversity_score
 
 
-# !! 注意: 我们需要修改 simulate_evaluation 的函数签名，让它可以接收 alpha_repository
 def simulate_evaluation(formula: AlphaFormula, node: AlphaNode, alpha_repo: AlphaLibrary) -> Dict[str, float]:
     """
     通过真实回测对一个 alpha 公式的多维度评估。

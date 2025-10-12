@@ -1,0 +1,82 @@
+==================== RUN START: 2025-10-09 13:04:05 ====================
+Factor Type: 成长因子
+--- Alpha 1 ---
+Name: price_volume_growth_proxy
+Q-Value: 5.1340
+In Library: No
+Formula: (rank(ts_delta(close, 20)) * rank(((volume - ts_mean(volume, 15)) / ts_std(volume, 15))))
+Scores: {"Effectiveness": 1.26, "Stability": 0.88, "Turnover": 5.43, "Diversity": 10.0, "Overfitting Risk": 6.0}
+--- Alpha 2 ---
+Name: stabilized_growth_factor
+Q-Value: 4.4100
+In Library: No
+Formula: (rank(ts_delta(close, 20)) * rank(((volume - ts_mean(volume, 10)) / ts_std(volume, 30))))
+Scores: {"Effectiveness": 1.23, "Stability": 0.87, "Turnover": 5.22, "Diversity": 10.0, "Overfitting Risk": 4.0}
+--- Alpha 3 ---
+Name: momentum_volume_interaction
+Q-Value: 4.3640
+In Library: No
+Formula: (scale(ts_delta(close, 10)) * scale(((volume - ts_mean(volume, 20)) / ts_std(volume, 20))))
+Scores: {"Effectiveness": 0.98, "Stability": 1.38, "Turnover": 5.46, "Diversity": 10.0, "Overfitting Risk": 4.0}
+--- Alpha 4 ---
+Name: stability_adjusted_growth_proxy
+Q-Value: 5.1340
+In Library: No
+Formula: (rank(ts_mean(ts_delta(close, 20), 15)) * rank(((volume - ts_mean(volume, 30)) / ts_std(volume, 30))))
+Scores: {"Effectiveness": 1.42, "Stability": 1.01, "Turnover": 6.19, "Diversity": 10.0, "Overfitting Risk": 6.0}
+--- Alpha 5 ---
+Name: stability_enhanced_growth_factor
+Q-Value: 4.6300
+In Library: No
+Formula: (rank(ts_mean(ts_delta(close, 20), 10)) - rank((ts_std(ts_delta(close, 20), 15) / ts_mean(abs(ts_delta(close, 20)), 15))))
+Scores: {"Effectiveness": 0.01, "Stability": 0.02, "Turnover": 9.12, "Diversity": 10.0, "Overfitting Risk": 4.0}
+--- Alpha 6 ---
+Name: stability_enhanced_growth_signal
+Q-Value: 5.1340
+In Library: Yes
+Formula: scale((rank(ts_mean(ts_delta(close, 20), 10)) * rank(((volume - ts_mean(volume, 30)) / ts_std(volume, 30)))))
+Scores: {"Effectiveness": 2.14, "Stability": 1.51, "Turnover": 7.02, "Diversity": 10.0, "Overfitting Risk": 5.0}
+--- Alpha 7 ---
+Name: stability_enhanced_momentum
+Q-Value: 3.3560
+In Library: Yes
+Formula: scale((rank(ts_mean(ts_delta(close, 20), 10)) * rank((abs((volume - ts_mean(volume, 30))) / ts_std(volume, 30)))))
+Scores: {"Effectiveness": 2.05, "Stability": 1.44, "Turnover": 6.09, "Diversity": 3.2, "Overfitting Risk": 4.0}
+--- Alpha 8 ---
+Name: adjusted_price_volume_momentum
+Q-Value: 3.5120
+In Library: No
+Formula: (scale(ts_mean(((close - open) / open), 20)) * scale(((volume - ts_mean(volume, 30)) / ts_std(volume, 30))))
+Scores: {"Effectiveness": 0.31, "Stability": 0.47, "Turnover": 5.84, "Diversity": 6.94, "Overfitting Risk": 4.0}
+--- Alpha 9 ---
+Name: growth_stability_factor
+Q-Value: 4.0120
+In Library: Yes
+Formula: (rank((ts_std(close, 20) / ts_mean(close, 20))) * rank(scale(volume, 1.0)))
+Scores: {"Effectiveness": 1.99, "Stability": 1.26, "Turnover": 8.14, "Diversity": 4.67, "Overfitting Risk": 4.0}
+--- Alpha 10 ---
+Name: price_volume_synchronization
+Q-Value: 4.4100
+In Library: No
+Formula: ((ts_rank(close, 20) * ts_rank(volume, 20)) / ts_std(close, 10))
+Scores: {"Effectiveness": 1.49, "Stability": 1.03, "Turnover": 7.61, "Diversity": 7.92, "Overfitting Risk": 4.0}
+--- Alpha 11 ---
+Name: price_volume_stability_signal
+Q-Value: 4.1200
+In Library: No
+Formula: (rank(ts_mean(ts_delta(close, 10), 20)) * rank((log(volume) / ts_mean(volume, 20))))
+Scores: {"Effectiveness": 1.02, "Stability": 0.73, "Turnover": 9.43, "Diversity": 4.42, "Overfitting Risk": 5.0}
+--- Alpha 12 ---
+Name: volume_weighted_price_momentum
+Q-Value: 3.8220
+In Library: Yes
+Formula: (rank(ts_delta(vwap, 10)) * rank(scale(volume)))
+Scores: {"Effectiveness": 2.2, "Stability": 1.52, "Turnover": 7.25, "Diversity": 3.14, "Overfitting Risk": 5.0}
+--- Alpha 13 ---
+Name: price_volume_stability_factor
+Q-Value: 3.5980
+In Library: Yes
+Formula: (rank((ts_std(close, 10) / ts_mean(close, 10))) * rank(scale(log(volume))))
+Scores: {"Effectiveness": 2.17, "Stability": 1.38, "Turnover": 8.74, "Diversity": 1.7, "Overfitting Risk": 4.0}
+==================== RUN END ====================
+

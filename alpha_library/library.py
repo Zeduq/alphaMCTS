@@ -17,6 +17,7 @@ class AlphaLibrary:
             "portrait": node.portrait,
             "q_value": node.q_value,
             "scores": node.scores,
+            "financial_metrics": node.financial_metrics,
             "visit_count": node.visits
         }
         alpha_name = alpha_data["portrait"].get('name', '未命名')

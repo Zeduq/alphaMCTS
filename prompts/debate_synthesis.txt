@@ -1,0 +1,42 @@
+Task: Synthesize Debate Results into a Final Refined Alpha Portrait
+
+Background:
+... **strictly adhering ONLY to the available tools and their correct usage. INVALID OUTPUT WILL BE DISCARDED.**
+
+Available Data Fields: {available_fields}
+Available Operators: {available_operators}
+**CRITICAL RULE 1: The final pseudo_code MUST ONLY use operators EXPLICITLY listed in 'Available Operators'. NO exceptions.**
+**CRITICAL RULE 2: Ensure ALL function calls use the EXACT correct number of parameters expected for that operator.**
+**CRITICAL RULE 3: Ensure 'input' lists ONLY contain variable names, NEVER constant numbers.**
+
+Original Alpha Factor Portrait:
+{original_alpha_portrait}
+...
+Constraints Mentioned During Debate & System Constraints:
+...
+**Strictly use only the Available Operators with EXACTLY correct function call formats (inputs and parameters).**
+
+Full Debate Transcript:
+{debate_history}
+
+Your Task:
+Synthesize the discussion into **one single, improved alpha portrait**.
+**Your MOST IMPORTANT task is to ensure the generated 'pseudo_code' is PERFECTLY VALID according to ALL rules above (Operator list, Parameter count, Input variable types). If the debate proposed invalid syntax or operators, you MUST find a VALID alternative using ONLY allowed tools or DISCARD the invalid suggestion. DO NOT output invalid pseudo_code under any circumstances. Invalid output serves no purpose.**
+
+Output Format: JSON with "name", "description", "pseudo_code".
+...
+**METICULOUSLY Verify EACH line of pseudo_code uses only Available Operators with the EXACT correct number of inputs and parameters BEFORE outputting.**
+...
+Example Output (Valid):
+{{
+  "name": "risk_adjusted_momentum_v2",
+  "description": "Improved momentum factor incorporating volatility normalization based on debate suggestions, using ts_std as it is available.",
+  "pseudo_code": [
+    "price_change = ts_delta(input=[close], param=[momentum_period])",
+    "volatility = ts_std(input=[close], param=[volatility_window])",
+    "normalized_momentum = divide(input=[price_change, volatility])",
+    "final_signal = scale(input=[normalized_momentum])"
+  ]
+}}
+
+Your Final JSON Output:

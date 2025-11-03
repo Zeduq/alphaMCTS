@@ -1,82 +1,88 @@
-==================== RUN START: 2025-10-09 13:04:05 ====================
-Factor Type: 成长因子
+==================== RUN START: 2025-11-04 00:10:35 ====================
+Factor Type: 价值因子
 --- Alpha 1 ---
-Name: price_volume_growth_proxy
-Q-Value: 5.1340
+Name: price_vwap_divergence_ratio
+Q-Value: 5.9700
 In Library: No
-Formula: (rank(ts_delta(close, 20)) * rank(((volume - ts_mean(volume, 15)) / ts_std(volume, 15))))
-Scores: {"Effectiveness": 1.26, "Stability": 0.88, "Turnover": 5.43, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Formula: ((close - vwap) / ts_std(close, 20))
+Scores: {"Effectiveness": 0.96, "Stability": 0.67, "Turnover": 9.09, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.019175526262843218, "rank_ic_std": 0.28541611709343334, "icir": -0.06718445495692155, "turnover": 0.09131043256997456, "annualized_return": 0.010376994011824854, "sharpe_ratio": 0.05899019244070237, "max_drawdown": -0.8870441037335628}
 --- Alpha 2 ---
-Name: stabilized_growth_factor
-Q-Value: 4.4100
-In Library: No
-Formula: (rank(ts_delta(close, 20)) * rank(((volume - ts_mean(volume, 10)) / ts_std(volume, 30))))
-Scores: {"Effectiveness": 1.23, "Stability": 0.87, "Turnover": 5.22, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Name: enhanced_price_vwap_stability
+Q-Value: 5.9700
+In Library: Yes
+Formula: ((close - vwap) / ts_std(ts_mean(close, 10), 20))
+Scores: {"Effectiveness": 1.05, "Stability": 0.74, "Turnover": 9.06, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.02098433542036393, "rank_ic_std": 0.2818316346553176, "icir": -0.07445699077049299, "turnover": 0.0935623409669211, "annualized_return": 0.010321476376575305, "sharpe_ratio": 0.0572801656419253, "max_drawdown": -0.887920539143871}
 --- Alpha 3 ---
-Name: momentum_volume_interaction
-Q-Value: 4.3640
+Name: stability_refined_divergence
+Q-Value: 3.8000
 In Library: No
-Formula: (scale(ts_delta(close, 10)) * scale(((volume - ts_mean(volume, 20)) / ts_std(volume, 20))))
-Scores: {"Effectiveness": 0.98, "Stability": 1.38, "Turnover": 5.46, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Formula: ((close - vwap) / scale(rank(ts_std(ts_mean(close, 30), 30)), 1.0))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 --- Alpha 4 ---
-Name: stability_adjusted_growth_proxy
-Q-Value: 5.1340
-In Library: No
-Formula: (rank(ts_mean(ts_delta(close, 20), 15)) * rank(((volume - ts_mean(volume, 30)) / ts_std(volume, 30))))
-Scores: {"Effectiveness": 1.42, "Stability": 1.01, "Turnover": 6.19, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Name: enhanced_price_vwap_divergence
+Q-Value: 5.3540
+In Library: Yes
+Formula: ((close - vwap) / (ts_std(close, 20) + ts_delta(ts_std(close, 20), 5)))
+Scores: {"Effectiveness": 1.08, "Stability": 0.8, "Turnover": 7.62, "Diversity": 7.53, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.021520568765244812, "rank_ic_std": 0.26962726635280787, "icir": -0.07981599582397242, "turnover": 0.23792620865139952, "annualized_return": 0.0036482150911101765, "sharpe_ratio": 0.01674149567605819, "max_drawdown": -0.8847291374063301}
 --- Alpha 5 ---
-Name: stability_enhanced_growth_factor
-Q-Value: 4.6300
+Name: dynamic_price_vwap_responsiveness
+Q-Value: 3.8000
 In Library: No
-Formula: (rank(ts_mean(ts_delta(close, 20), 10)) - rank((ts_std(ts_delta(close, 20), 15) / ts_mean(abs(ts_delta(close, 20)), 15))))
-Scores: {"Effectiveness": 0.01, "Stability": 0.02, "Turnover": 9.12, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Formula: ((close - vwap) / scale((ts_std(close, 30) + ts_delta(close, 5)), 10))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 --- Alpha 6 ---
-Name: stability_enhanced_growth_signal
-Q-Value: 5.1340
-In Library: Yes
-Formula: scale((rank(ts_mean(ts_delta(close, 20), 10)) * rank(((volume - ts_mean(volume, 30)) / ts_std(volume, 30)))))
-Scores: {"Effectiveness": 2.14, "Stability": 1.51, "Turnover": 7.02, "Diversity": 10.0, "Overfitting Risk": 5.0}
+Name: stabilized_price_vwap_divergence
+Q-Value: 4.1240
+In Library: No
+Formula: ((close - vwap) / ts_mean(abs(ts_delta(close, 1)), 20))
+Scores: {"Effectiveness": 0.59, "Stability": 0.42, "Turnover": 9.26, "Diversity": 2.35, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.011834484269411676, "rank_ic_std": 0.28293416285474243, "icir": -0.04182769641532283, "turnover": 0.07441475826972012, "annualized_return": 0.024409202333835027, "sharpe_ratio": 0.1460080593366091, "max_drawdown": -0.8478972829572952}
 --- Alpha 7 ---
-Name: stability_enhanced_momentum
-Q-Value: 3.3560
-In Library: Yes
-Formula: scale((rank(ts_mean(ts_delta(close, 20), 10)) * rank((abs((volume - ts_mean(volume, 30))) / ts_std(volume, 30)))))
-Scores: {"Effectiveness": 2.05, "Stability": 1.44, "Turnover": 6.09, "Diversity": 3.2, "Overfitting Risk": 4.0}
+Name: optimized_price_vwap_stability
+Q-Value: 3.8000
+In Library: No
+Formula: scale(((close - vwap) / log(ts_std(close, 20))))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 --- Alpha 8 ---
-Name: adjusted_price_volume_momentum
-Q-Value: 3.5120
+Name: rank_scaled_divergence_ratio
+Q-Value: 3.6000
 In Library: No
-Formula: (scale(ts_mean(((close - open) / open), 20)) * scale(((volume - ts_mean(volume, 30)) / ts_std(volume, 30))))
-Scores: {"Effectiveness": 0.31, "Stability": 0.47, "Turnover": 5.84, "Diversity": 6.94, "Overfitting Risk": 4.0}
+Formula: (rank((close - vwap)) / scale(ts_std(close, 20), 10))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 --- Alpha 9 ---
-Name: growth_stability_factor
-Q-Value: 4.0120
-In Library: Yes
-Formula: (rank((ts_std(close, 20) / ts_mean(close, 20))) * rank(scale(volume, 1.0)))
-Scores: {"Effectiveness": 1.99, "Stability": 1.26, "Turnover": 8.14, "Diversity": 4.67, "Overfitting Risk": 4.0}
+Name: adaptive_price_vwap_volatility_v2
+Q-Value: 5.3540
+In Library: No
+Formula: ((close - vwap) / abs((ts_delta(ts_std(close, 20), 10) / ts_mean(ts_std(close, 20), 20))))
+Scores: {"Effectiveness": 0.6, "Stability": 0.39, "Turnover": 7.68, "Diversity": 9.1, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.011936914298996857, "rank_ic_std": 0.30250761264006815, "icir": -0.039459880678109495, "turnover": 0.23244274809160304, "annualized_return": 0.06670768015330945, "sharpe_ratio": 0.31676142231640003, "max_drawdown": -0.863153217110995}
 --- Alpha 10 ---
-Name: price_volume_synchronization
-Q-Value: 4.4100
+Name: responsive_price_vwap_divergence
+Q-Value: 3.8000
 In Library: No
-Formula: ((ts_rank(close, 20) * ts_rank(volume, 20)) / ts_std(close, 10))
-Scores: {"Effectiveness": 1.49, "Stability": 1.03, "Turnover": 7.61, "Diversity": 7.92, "Overfitting Risk": 4.0}
+Formula: scale(((close / vwap) / ts_delta(ts_std(close, 20), 10)))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 --- Alpha 11 ---
-Name: price_volume_stability_signal
-Q-Value: 4.1200
+Name: robust_price_vwap_divergence
+Q-Value: 5.4640
 In Library: No
-Formula: (rank(ts_mean(ts_delta(close, 10), 20)) * rank((log(volume) / ts_mean(volume, 20))))
-Scores: {"Effectiveness": 1.02, "Stability": 0.73, "Turnover": 9.43, "Diversity": 4.42, "Overfitting Risk": 5.0}
+Formula: ((close - vwap) / (log(ts_std(close, 20)) / ts_mean(volume, 20)))
+Scores: {"Effectiveness": 0.35, "Stability": 0.38, "Turnover": 9.3, "Diversity": 9.29, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.006975968213109427, "rank_ic_std": 0.18416356978928117, "icir": -0.03787919739550709, "turnover": 0.07048346055979644, "annualized_return": 0.016364034056816027, "sharpe_ratio": 0.13995390576782124, "max_drawdown": -0.9203589034687512}
 --- Alpha 12 ---
-Name: volume_weighted_price_momentum
-Q-Value: 3.8220
-In Library: Yes
-Formula: (rank(ts_delta(vwap, 10)) * rank(scale(volume)))
-Scores: {"Effectiveness": 2.2, "Stability": 1.52, "Turnover": 7.25, "Diversity": 3.14, "Overfitting Risk": 5.0}
---- Alpha 13 ---
-Name: price_volume_stability_factor
-Q-Value: 3.5980
-In Library: Yes
-Formula: (rank((ts_std(close, 10) / ts_mean(close, 10))) * rank(scale(log(volume))))
-Scores: {"Effectiveness": 2.17, "Stability": 1.38, "Turnover": 8.74, "Diversity": 1.7, "Overfitting Risk": 4.0}
+Name: adaptive_price_vwap_divergence
+Q-Value: 3.8000
+In Library: No
+Formula: (ts_rank((scale(close) / scale(vwap)), 10) / (log(ts_std(close, 10)) / ts_rank(volume, 10)))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
 ==================== RUN END ====================
 

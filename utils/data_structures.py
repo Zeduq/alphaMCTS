@@ -68,6 +68,7 @@ class AlphaNode:
     parent: Optional['AlphaNode'] = None
     children: List['AlphaNode'] = field(default_factory=list)
     scores: Dict[str, float] = field(default_factory=dict)
+    financial_metrics: Dict[str, float] = field(default_factory=dict)
     q_value: float = 0.0
     visits: int = 0
     refinement_summary: str = "Initial root node."

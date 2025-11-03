@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 import openai
 
-from config import LLM_MODEL, OPENAI_API_KEY, BASE_URL
+from config import LLM_MODEL, OPENAI_API_KEY, BASE_URL, LLM_TEMPERATURE
 
 
 class BaseAgent(ABC):
@@ -39,7 +39,7 @@ class BaseAgent(ABC):
                 model=LLM_MODEL,
                 messages=[{"role": "user", "content": formatted_prompt}],
                 response_format={"type": "json_object"},
-                temperature=0.7,
+                temperature=LLM_TEMPERATURE,
             )
             content = response.choices[0].message.content
             if not content:

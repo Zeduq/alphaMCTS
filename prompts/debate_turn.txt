@@ -1,0 +1,46 @@
+Task: Participate in a Multi-Agent Debate to Refine an Alpha Factor
+
+Background:
+You are part of a team debating how to improve an existing quantitative alpha factor. Your goal is to contribute constructive ideas or critiques based on your assigned persona and the context provided. **You MUST strictly adhere ONLY to the available tools and their correct usage as listed below. FAILURE TO DO SO WILL INVALIDATE YOUR CONTRIBUTION.**
+
+Available Data Fields: {available_fields}
+Available Operators: {available_operators}
+**CRITICAL RULE 1: ABSOLUTELY FORBIDDEN to propose or use ANY operator NOT EXPLICITLY listed in 'Available Operators'. Check the list carefully. NO exceptions (e.g., NO median, quantile, iqr, decay_mean, custom math functions). VIOLATION IS UNACCEPTABLE.**
+**CRITICAL RULE 2: STRICTLY follow the EXACT standard argument count for each operator listed. Example: 'ts_mean' takes EXACTLY ONE input and EXACTLY ONE parameter (window). Providing more or fewer (e.g., 'ts_mean(vwap, 30, 0.9)') is INVALID and WILL BE REJECTED.**
+**CRITICAL RULE 3: Ensure 'input' lists for operators ONLY contain valid variable names (from Available Data Fields or previous steps). NEVER include constant numbers (like '2') in the 'input' list.**
+
+Your Persona: {persona}
+
+Current Alpha Factor Details:
+{current_alpha_portrait}
+
+Optimization Goal: Improve '{optimization_target}' dimension for '{factor_type}' concept.
+
+Constraints:
+Avoid sub-expressions: {fsa_avoid_list}
+Max 3 parameters total. Dimensionless output.
+**ONLY use Available Operators with EXACTLY correct syntax (inputs AND parameters).**
+
+Debate History (Previous turns):
+{debate_history}
+
+Your Task:
+1. Analyze...
+2. Suggest/Critique:
+    * Main Agent: Propose a concrete refinement idea. **Your suggestion MUST ONLY use operators from the 'Available Operators' list AND use them with the EXACT correct number of inputs/parameters. DOUBLE-CHECK THIS before outputting. Invalid proposals are useless.**
+    * Critic Agent: Identify flaws... **Your ABSOLUTE PRIMARY task is to meticulously verify suggestions against the Available Operators list AND their EXACT required argument counts (inputs and parameters). Explicitly state 'INVALID OPERATOR' or 'INVALID SYNTAX (parameter count)' if a violation occurs. This validation is MORE important than suggesting alternatives.**
+
+Output Format: JSON with "analysis" and "contribution".
+
+Example Output (Critic Agent - Catching Invalid Syntax):
+{{
+  "analysis": "Agent A suggested using 'ts_mean(vwap, 30, 0.9)'...",
+  "contribution": "Critique: Agent A's suggestion is INVALID SYNTAX (parameter count). 'ts_mean' requires exactly 1 parameter (window), but 2 were provided (30, 0.9). Suggestion must be corrected to use valid syntax."
+}}
+Example Output (Critic Agent - Catching Invalid Operator):
+{{
+  "analysis": "Agent B suggested using 'ts_median'...",
+  "contribution": "Critique: Agent B's suggestion is INVALID OPERATOR. 'ts_median' is NOT in the Available Operators list. Suggestion must be revised using only allowed operators."
+}}
+
+Your JSON Response:

@@ -1,0 +1,49 @@
+任务描述：
+你是一名专注于因子投资的量化金融专家。
+请基于可用的数据和算子，设计一个新的、原创的投资策略 Alpha 因子。
+{factor_type_guidance}
+
+可用数据字段：
+
+以下数据字段可供使用：{available_fields}
+
+可用算子列表：
+
+以下算子可供使用：{available_operators}
+
+Alpha 因子要求：
+
+1. Alpha 值应当是无量纲的（unitless）。
+2. Alpha 应当至少包含“可用算子列表”中的两个不同算子，以确保其具有足够的复杂性。
+3. 避免创建过于简单的 Alpha。
+4. Alpha 计算中使用的所有回溯窗口（look-back windows）和其他数值参数必须在伪代码中表示为命名参数。
+5. 这些参数名称必须遵循 Python 命名规范（例如：lookback_period, volatility_window, smoothing_factor）。
+6. Alpha 总共包含的参数数量不得超过 3 个。
+7. 伪代码应逐步表示 Alpha 的计算过程，仅使用“可用算子列表”中的算子和明确定义的参数。
+8. 伪代码中的每一行应代表一个单独的操作。
+9. 在伪代码中使用描述性的变量名，清晰地表明它们所代表的数据。
+10. 在设计 Alpha 表达式时，尽量避免包含以下子表达式：
+{freq_subtrees}
+
+格式要求：
+输出必须是包含三个键值对的 JSON 格式：
+
+* "name": 一个简短的、描述性的 Alpha 名称（遵循 Python 变量命名风格，例如：price_volatility_ratio）。
+* "description": 对 Alpha 用途或其衡量内容的简明解释。避免使用过于晦涩的技术术语。重点关注 Alpha 背后的直觉逻辑。
+* "pseudo_code": 一个字符串列表，其中每个字符串是表示 Alpha 计算中单个操作的简化伪代码。
+    每一行应遵循格式：variable_name = op_name(input=[input1, input2, ...], param=[param1, param2, ...])，其中：
+    * variable_name 是该操作的输出变量。
+    * op_name 是“可用算子列表”中的算子名称之一。
+    * input1, input2, ... 是输入变量（来自“可用数据字段”或之前计算出的变量，不能是数值类型）。
+    * param1, param2, ... 是“Alpha 因子要求”中定义的参数名称。
+
+格式示例如下：
+{{
+"name": "volatility_adjusted_momentum",
+"description": "该因子衡量价格动量，并根据近期的波动率进行了调整。",
+"pseudo_code": [
+"price_range = subtract(input=[high, low])",
+"momentum = ts_delta(input=[close], param=[momentum_period])",
+"adjusted_momentum = divide(input=[momentum, price_range])"
+]
+}}

@@ -1,0 +1,74 @@
+==================== RUN START: 2025-11-26 19:03:16 ====================
+Factor Type: 波动率因子
+--- Alpha 1 ---
+Name: volatility_normalized_price_fluctuation
+Q-Value: 5.1820
+In Library: No
+Formula: ((high - low) / (ts_std((high - low), 20) / vwap))
+Scores: {"Effectiveness": 0.64, "Stability": 0.29, "Turnover": 9.08, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": 0.0064288545091381434, "rank_ic_std": 0.22066727793693908, "icir": 0.029133701059997404, "turnover": 0.09158162859701802, "annualized_return": 0.028430393301916324, "sharpe_ratio": 0.2408422540325715, "max_drawdown": -0.9864118920173597}
+--- Alpha 2 ---
+Name: volatility_normalized_price_fluctuation_v2
+Q-Value: 5.1820
+In Library: No
+Formula: ((high - low) / (sma(ts_std((high - low), 20), 3) / vwap))
+Scores: {"Effectiveness": 0.6, "Stability": 0.27, "Turnover": 9.04, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 0.005999623746745705, "rank_ic_std": 0.21985670693598233, "icir": 0.027288791096523927, "turnover": 0.09581654442257515, "annualized_return": 0.03093763471239197, "sharpe_ratio": 0.2525545224196166, "max_drawdown": -0.9865918178457336}
+--- Alpha 3 ---
+Name: volatility_normalized_price_fluctuation_v3
+Q-Value: 5.0700
+In Library: No
+Formula: decay_linear(((high - low) / (sma((ts_std((high - low), 20) * rank(volume)), 3) / vwap)), 5)
+Scores: {"Effectiveness": 0.95, "Stability": 0.45, "Turnover": 9.95, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": 0.009547937184721668, "rank_ic_std": 0.21426902791453561, "icir": 0.044560510110355306, "turnover": 0.004867558225169599, "annualized_return": 0.010086945439637285, "sharpe_ratio": 0.15151681354263538, "max_drawdown": -0.9805751670789349}
+--- Alpha 4 ---
+Name: stabilized_volatility_normalized_price_fluctuation
+Q-Value: 5.0340
+In Library: No
+Formula: (sma((high - low), 10) / (ts_std((high - low), 20) / vwap))
+Scores: {"Effectiveness": 0.85, "Stability": 0.37, "Turnover": 9.95, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": 0.008534444421842126, "rank_ic_std": 0.23026964066588518, "icir": 0.037062829460117006, "turnover": 0.0050707525692959, "annualized_return": 0.03342449910923384, "sharpe_ratio": 0.2620859862548211, "max_drawdown": -0.9869679209194663}
+--- Alpha 5 ---
+Name: stabilized_volatility_smooth_fluctuation_v2
+Q-Value: 5.0100
+In Library: No
+Formula: (sma(scale((high - low)), 15) / ts_std((high - low), 20))
+Scores: {"Effectiveness": 1.57, "Stability": 1.21, "Turnover": 9.27, "Diversity": 10.0, "Overfitting Risk": 3.0}
+Financial Metrics: {"rank_ic_mean": 0.015724432194662925, "rank_ic_std": 0.1303479829626052, "icir": 0.1206342579092614, "turnover": 0.07283400603456047, "annualized_return": 0.04602585315630359, "sharpe_ratio": 0.4171124163067552, "max_drawdown": -0.8387846994993854}
+--- Alpha 6 ---
+Name: volatility_normalized_price_fluctuation_v4
+Q-Value: 4.8800
+In Library: No
+Formula: decay_linear(((high - low) / sma(ts_std((high - low), 20), 10)), 15)
+Scores: {"Effectiveness": 0.39, "Stability": 0.27, "Turnover": 9.74, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": 0.0039456685318734535, "rank_ic_std": 0.14491996196943946, "icir": 0.027226535794327017, "turnover": 0.02624784651184875, "annualized_return": 0.05464233710757038, "sharpe_ratio": 0.4515110980277063, "max_drawdown": -0.6995143327837834}
+--- Alpha 7 ---
+Name: enhanced_volatility_momentum_alpha
+Q-Value: 4.6480
+In Library: No
+Formula: (((high - low) / (ts_std((high - low), 5) / vwap)) + (ts_corr(volume, vwap, 10) + ts_delta(close, 5)))
+Scores: {"Effectiveness": 1.98, "Stability": 1.28, "Turnover": 6.98, "Diversity": 10.0, "Overfitting Risk": 3.0}
+Financial Metrics: {"rank_ic_mean": -0.019750601636035293, "rank_ic_std": 0.15426852396057805, "icir": -0.12802742341063938, "turnover": 0.30221377118586035, "annualized_return": -0.08038324223815041, "sharpe_ratio": -0.48129077185114333, "max_drawdown": -0.9561475179724879}
+--- Alpha 8 ---
+Name: optimized_market_activity_alpha
+Q-Value: 4.5780
+In Library: No
+Formula: (ts_corr(volume, vwap, 5) + (ts_std((high - low), 5) * ((high - low) / ts_mean(vwap, 10))))
+Scores: {"Effectiveness": 0.14, "Stability": 0.08, "Turnover": 9.67, "Diversity": 10.0, "Overfitting Risk": 3.0}
+Financial Metrics: {"rank_ic_mean": 0.0013624129973453332, "rank_ic_std": 0.17699205821171704, "icir": 0.0076975939548407386, "turnover": 0.03349049860301678, "annualized_return": 0.04174537777934928, "sharpe_ratio": 0.3325401819792695, "max_drawdown": -0.9526943203221041}
+--- Alpha 9 ---
+Name: enhanced_stability_and_dynamic_sensitivity
+Q-Value: 4.9620
+In Library: No
+Formula: ((sma((high - low), 10) / (ts_std((high - low), 20) / vwap)) / sma((ts_std((high - low), 20) * scale(volume)), 10))
+Scores: {"Effectiveness": 0.96, "Stability": 0.88, "Turnover": 9.97, "Diversity": 10.0, "Overfitting Risk": 3.0}
+Financial Metrics: {"rank_ic_mean": 0.009625952061887101, "rank_ic_std": 0.10994590279599227, "icir": 0.08755171240667628, "turnover": 0.0028528009624674278, "annualized_return": -0.04353397804319248, "sharpe_ratio": -0.3559781192689187, "max_drawdown": -0.841508203627983}
+--- Alpha 10 ---
+Name: optimized_volatility_adjusted_fluctuation
+Q-Value: 4.2280
+In Library: No
+Formula: decay_linear(((ts_std((high - low), 10) / rank(ts_delta(volume, 1))) * sign(ts_delta(close, 1))), 5)
+Scores: {"Effectiveness": 0.32, "Stability": 0.29, "Turnover": 6.53, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": 0.0031954038288786236, "rank_ic_std": 0.10970340029892557, "icir": 0.029127664413059393, "turnover": 0.3468327291975005, "annualized_return": -0.03915859468916627, "sharpe_ratio": -0.33186717776478064, "max_drawdown": -0.8579412132350277}
+==================== RUN END ====================
+

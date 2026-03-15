@@ -1,88 +1,88 @@
-==================== RUN START: 2025-11-04 00:10:35 ====================
-Factor Type: 价值因子
+==================== RUN START: 2026-02-24 01:41:34 ====================
+Factor Type: 动量因子
 --- Alpha 1 ---
-Name: price_vwap_divergence_ratio
-Q-Value: 5.9700
+Name: smoothed_volume_weighted_momentum
+Q-Value: 6.1100
 In Library: No
-Formula: ((close - vwap) / ts_std(close, 20))
-Scores: {"Effectiveness": 0.96, "Stability": 0.67, "Turnover": 9.09, "Diversity": 10.0, "Overfitting Risk": 8.0}
-Financial Metrics: {"rank_ic_mean": -0.019175526262843218, "rank_ic_std": 0.28541611709343334, "icir": -0.06718445495692155, "turnover": 0.09131043256997456, "annualized_return": 0.010376994011824854, "sharpe_ratio": 0.05899019244070237, "max_drawdown": -0.8870441037335628}
+Formula: ts_rank((ts_delta(close, 10) / decay_linear((close * volume), 20)), 30)
+Scores: {"Effectiveness": 1.42, "Stability": 0.89, "Turnover": 7.96, "Diversity": 9.17, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 0.014226301103760632, "rank_ic_std": 0.160020817544754, "icir": 0.08890281478396944, "turnover": 0.20441840403136358, "annualized_return": 0.08927203290835273, "sharpe_ratio": 0.6565425414948248, "max_drawdown": -0.38993595403827547, "excess_return": 0.7923515171571207, "information_ratio": 1.627643286280199}
 --- Alpha 2 ---
-Name: enhanced_price_vwap_stability
-Q-Value: 5.9700
-In Library: Yes
-Formula: ((close - vwap) / ts_std(ts_mean(close, 10), 20))
-Scores: {"Effectiveness": 1.05, "Stability": 0.74, "Turnover": 9.06, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": -0.02098433542036393, "rank_ic_std": 0.2818316346553176, "icir": -0.07445699077049299, "turnover": 0.0935623409669211, "annualized_return": 0.010321476376575305, "sharpe_ratio": 0.0572801656419253, "max_drawdown": -0.887920539143871}
+Name: stable_volume_weighted_relative_momentum
+Q-Value: 5.5980
+In Library: No
+Formula: ts_rank(decay_linear((ts_rank(close, 20) * rank(volume)), 10), 30)
+Scores: {"Effectiveness": 1.09, "Stability": 0.69, "Turnover": 8.86, "Diversity": 9.35, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.01088696201364236, "rank_ic_std": 0.15737926880205674, "icir": 0.06917659547227532, "turnover": 0.11378189303526753, "annualized_return": 0.10577485241619033, "sharpe_ratio": 0.7533217393490313, "max_drawdown": -0.48195653981155345, "excess_return": 0.8876717177809896, "information_ratio": 1.7565169525543471}
 --- Alpha 3 ---
-Name: stability_refined_divergence
-Q-Value: 3.8000
+Name: stable_volume_weighted_relative_momentum
+Q-Value: 4.8340
 In Library: No
-Formula: ((close - vwap) / scale(rank(ts_std(ts_mean(close, 30), 30)), 1.0))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Formula: ts_rank((ts_rank(decay_linear(close, 10), 20) * rank(ts_mean(volume, 15))), 20)
+Scores: {"Effectiveness": 1.1, "Stability": 0.72, "Turnover": 5.0, "Diversity": 9.35, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.010994075164513428, "rank_ic_std": 0.1519560082957468, "icir": 0.07235038145458543, "turnover": 0.5, "annualized_return": 0.10567086706264028, "sharpe_ratio": 0.811349697667461, "max_drawdown": -0.4174468634687119, "excess_return": 1.1078830011754315, "information_ratio": 2.0862603610644896}
 --- Alpha 4 ---
-Name: enhanced_price_vwap_divergence
-Q-Value: 5.3540
-In Library: Yes
-Formula: ((close - vwap) / (ts_std(close, 20) + ts_delta(ts_std(close, 20), 5)))
-Scores: {"Effectiveness": 1.08, "Stability": 0.8, "Turnover": 7.62, "Diversity": 7.53, "Overfitting Risk": 8.0}
-Financial Metrics: {"rank_ic_mean": -0.021520568765244812, "rank_ic_std": 0.26962726635280787, "icir": -0.07981599582397242, "turnover": 0.23792620865139952, "annualized_return": 0.0036482150911101765, "sharpe_ratio": 0.01674149567605819, "max_drawdown": -0.8847291374063301}
+Name: rank_based_volume_adjusted_momentum
+Q-Value: 4.8980
+In Library: No
+Formula: ts_rank(decay_linear((ts_rank(ts_delta(close, 10), 20) * ts_rank(volume, 20)), 5), 20)
+Scores: {"Effectiveness": 0.29, "Stability": 0.2, "Turnover": 7.91, "Diversity": 9.09, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": 0.0028877734512150733, "rank_ic_std": 0.14587366069372545, "icir": 0.019796400786007605, "turnover": 0.20863187406004935, "annualized_return": -0.03960511422921276, "sharpe_ratio": -0.22560216096569322, "max_drawdown": -0.7438628521358301, "excess_return": -0.1536981431839115, "information_ratio": -0.25381035999797924}
 --- Alpha 5 ---
-Name: dynamic_price_vwap_responsiveness
-Q-Value: 3.8000
+Name: stable_volume_weighted_relative_momentum_v2
+Q-Value: 4.9380
 In Library: No
-Formula: ((close - vwap) / scale((ts_std(close, 30) + ts_delta(close, 5)), 10))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Formula: ts_rank(((ts_mean(close, 20) * rank(volume)) / decay_linear(ts_std(((high - low) / vwap), 10), 10)), 5)
+Scores: {"Effectiveness": 0.98, "Stability": 0.92, "Turnover": 5.0, "Diversity": 9.79, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.009754371394124935, "rank_ic_std": 0.10583511483607358, "icir": -0.09216573732861097, "turnover": 0.5, "annualized_return": -0.0628245737937626, "sharpe_ratio": -0.7009664656309657, "max_drawdown": -0.879376507884617, "excess_return": -0.25630258158527985, "information_ratio": -0.8978489175981924}
 --- Alpha 6 ---
-Name: stabilized_price_vwap_divergence
-Q-Value: 4.1240
+Name: smoothed_volume_weighted_momentum
+Q-Value: 4.8240
 In Library: No
-Formula: ((close - vwap) / ts_mean(abs(ts_delta(close, 1)), 20))
-Scores: {"Effectiveness": 0.59, "Stability": 0.42, "Turnover": 9.26, "Diversity": 2.35, "Overfitting Risk": 8.0}
-Financial Metrics: {"rank_ic_mean": -0.011834484269411676, "rank_ic_std": 0.28293416285474243, "icir": -0.04182769641532283, "turnover": 0.07441475826972012, "annualized_return": 0.024409202333835027, "sharpe_ratio": 0.1460080593366091, "max_drawdown": -0.8478972829572952}
+Formula: ts_rank(((ts_delta(close, 5) / close) / decay_linear(vwap, 10)), 20)
+Scores: {"Effectiveness": 0.72, "Stability": 0.47, "Turnover": 6.58, "Diversity": 8.35, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.007249479434962317, "rank_ic_std": 0.15497686705318695, "icir": -0.04677781641097666, "turnover": 0.3415190360456155, "annualized_return": -0.05352349780511545, "sharpe_ratio": -0.3065588882066449, "max_drawdown": -0.8755470493085217, "excess_return": -0.29967183423485966, "information_ratio": -0.6813789351103388}
 --- Alpha 7 ---
-Name: optimized_price_vwap_stability
-Q-Value: 3.8000
+Name: robust_range_volume_momentum
+Q-Value: 4.7120
 In Library: No
-Formula: scale(((close - vwap) / log(ts_std(close, 20))))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Formula: ts_rank(decay_linear((ts_rank(((high - low) / close), 20) * ts_rank(volume, 20)), 10), 20)
+Scores: {"Effectiveness": 0.67, "Stability": 0.53, "Turnover": 5.0, "Diversity": 9.36, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.006694498923277314, "rank_ic_std": 0.12538976150589468, "icir": 0.05338951795488183, "turnover": 0.5, "annualized_return": 0.06143266516575441, "sharpe_ratio": 0.5973626382567884, "max_drawdown": -0.44319970738703063, "excess_return": 0.38379157617391857, "information_ratio": 1.1408129168773653}
 --- Alpha 8 ---
-Name: rank_scaled_divergence_ratio
-Q-Value: 3.6000
+Name: robust_volume_weighted_momentum
+Q-Value: 4.7640
 In Library: No
-Formula: (rank((close - vwap)) / scale(ts_std(close, 20), 10))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Formula: ts_rank((ts_rank(ts_delta(close, 5), 20) * ts_rank(ts_mean(volume, 10), 20)), 20)
+Scores: {"Effectiveness": 0.03, "Stability": 0.02, "Turnover": 7.05, "Diversity": 8.72, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.00032824119312361346, "rank_ic_std": 0.1332002624686765, "icir": -0.0024642683658435203, "turnover": 0.2952404411490871, "annualized_return": 0.0016556032199723791, "sharpe_ratio": 0.07555515371934926, "max_drawdown": -0.5307871037787812, "excess_return": -0.08339545047347119, "information_ratio": -0.08340394006772987}
 --- Alpha 9 ---
-Name: adaptive_price_vwap_volatility_v2
-Q-Value: 5.3540
+Name: stable_volume_weighted_relative_momentum
+Q-Value: 4.9660
 In Library: No
-Formula: ((close - vwap) / abs((ts_delta(ts_std(close, 20), 10) / ts_mean(ts_std(close, 20), 20))))
-Scores: {"Effectiveness": 0.6, "Stability": 0.39, "Turnover": 7.68, "Diversity": 9.1, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": -0.011936914298996857, "rank_ic_std": 0.30250761264006815, "icir": -0.039459880678109495, "turnover": 0.23244274809160304, "annualized_return": 0.06670768015330945, "sharpe_ratio": 0.31676142231640003, "max_drawdown": -0.863153217110995}
+Formula: ts_rank(ts_corr(((ts_max(high, 20) - ts_min(low, 20)) / ts_mean(close, 20)), ts_rank(volume, 20), 15), 10)
+Scores: {"Effectiveness": 1.3, "Stability": 0.53, "Turnover": 5.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.012986149118182416, "rank_ic_std": 0.24708205957356758, "icir": -0.05255804140776092, "turnover": 0.5, "annualized_return": 0.04136558526829193, "sharpe_ratio": 0.3595276477708135, "max_drawdown": -0.7714847380529577, "excess_return": 0.08391842567404018, "information_ratio": 0.40007315356627254}
 --- Alpha 10 ---
-Name: responsive_price_vwap_divergence
-Q-Value: 3.8000
-In Library: No
-Formula: scale(((close / vwap) / ts_delta(ts_std(close, 20), 10)))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Name: stable_time_series_momentum
+Q-Value: 6.1100
+In Library: Yes
+Formula: ts_rank(decay_linear(((ts_delta(close, 20) - ts_mean(ts_delta(close, 20), 20)) / ts_std(ts_delta(close, 20), 20)), 10), 30)
+Scores: {"Effectiveness": 2.42, "Stability": 1.65, "Turnover": 8.96, "Diversity": 9.52, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.024217199617803355, "rank_ic_std": 0.146574544695199, "icir": 0.16522104617935462, "turnover": 0.10352829934225738, "annualized_return": 0.12826712706397858, "sharpe_ratio": 0.9717822652581832, "max_drawdown": -0.3845109950826878, "excess_return": 2.108735267965788, "information_ratio": 3.200315522714664}
 --- Alpha 11 ---
-Name: robust_price_vwap_divergence
-Q-Value: 5.4640
+Name: stable_time_series_momentum
+Q-Value: 4.3620
 In Library: No
-Formula: ((close - vwap) / (log(ts_std(close, 20)) / ts_mean(volume, 20)))
-Scores: {"Effectiveness": 0.35, "Stability": 0.38, "Turnover": 9.3, "Diversity": 9.29, "Overfitting Risk": 8.0}
-Financial Metrics: {"rank_ic_mean": -0.006975968213109427, "rank_ic_std": 0.18416356978928117, "icir": -0.03787919739550709, "turnover": 0.07048346055979644, "annualized_return": 0.016364034056816027, "sharpe_ratio": 0.13995390576782124, "max_drawdown": -0.9203589034687512}
+Formula: ts_rank(decay_linear(sign(ts_delta(vwap, 20)), 10), 30)
+Scores: {"Effectiveness": 0.72, "Stability": 0.49, "Turnover": 5.0, "Diversity": 6.6, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.007246622125994724, "rank_ic_std": 0.1480448568706686, "icir": -0.04894882726203278, "turnover": 0.5, "annualized_return": -0.003952833792648991, "sharpe_ratio": 0.02788377439364767, "max_drawdown": -0.6614291787923209, "excess_return": 0.20524338806553466, "information_ratio": 0.6961141319873139}
 --- Alpha 12 ---
-Name: adaptive_price_vwap_divergence
-Q-Value: 3.8000
+Name: stable_time_series_momentum_v2
+Q-Value: 3.8240
 In Library: No
-Formula: (ts_rank((scale(close) / scale(vwap)), 10) / (log(ts_std(close, 10)) / ts_rank(volume, 10)))
-Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 9.0}
-Financial Metrics: {"rank_ic_mean": 0.0, "rank_ic_std": 0.0, "icir": 0.0, "turnover": 1.0, "annualized_return": 0.0, "sharpe_ratio": 0.0, "max_drawdown": -1.0}
+Formula: ts_rank(decay_linear((ts_delta(vwap, 20) / ts_std(ts_delta(vwap, 20), 20)), 10), 30)
+Scores: {"Effectiveness": 0.18, "Stability": 0.11, "Turnover": 5.0, "Diversity": 5.83, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.0018005534024403945, "rank_ic_std": 0.1610086956733409, "icir": -0.011182957509906232, "turnover": 0.5, "annualized_return": 0.044858365165064695, "sharpe_ratio": 0.386456538799718, "max_drawdown": -0.618810094879546, "excess_return": 0.441827628552947, "information_ratio": 1.113793312831946}
 ==================== RUN END ====================
 

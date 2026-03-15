@@ -1,7 +1,9 @@
 import json
+import os
 import numpy as np
 import traceback
 from datetime import datetime
+from config import PROMPT_DIR
 from mcts.search import MCTS
 from utils.data_structures import AlphaNode, AlphaFormula
 from agents.portrait_agent import PortraitAgent
@@ -14,9 +16,10 @@ from fsa.fsa_miner import mine_frequent_subtrees
 
 # (initialize_root_node 函数保持不变)
 def initialize_root_node(factor_type: str) -> AlphaNode:
-    print("--- 正在初始化根节点 ---")
-    portrait_agent = PortraitAgent(prompt_path="prompts/portrait_generation.txt")
-    formula_agent = FormulaAgent(prompt_path="prompts/formula_generation.txt")
+    print(f"--- 正在初始化根节点 (使用提示词目录: {PROMPT_DIR}) ---")
+    # 使用 os.path.join 拼接路径
+    portrait_agent = PortraitAgent(prompt_path=os.path.join(PROMPT_DIR, "portrait_generation.txt"))
+    formula_agent = FormulaAgent(prompt_path=os.path.join(PROMPT_DIR, "formula_generation.txt"))
     root_portrait = portrait_agent.execute(freq_subtrees=[], factor_type=factor_type)
     if not root_portrait: raise Exception("生成初始Alpha画像失败。")
     root_formula = formula_agent.execute(alpha_portrait=root_portrait)

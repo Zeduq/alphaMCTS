@@ -1,0 +1,5 @@
+Group,Q-Value,Metric_rank_ic_mean,Metric_icir,Metric_sharpe_ratio,Score_Diversity
+Group A (GPT-4o/English),5.7403,-0.0103,-0.09,-0.3473,7.1308
+Group B (GPT-4o/Chinese),4.8774,0.0045,0.0282,0.0939,10.0
+Group C (QwenMax/English),5.7202,0.0023,0.0078,0.2476,10.0
+Group D (QwenMax/Chinese),5.594,-0.0031,-0.0182,0.053,8.8275

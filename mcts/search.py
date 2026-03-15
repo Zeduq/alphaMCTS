@@ -1,5 +1,7 @@
 import json
+import os
 import numpy as np
+from config import PROMPT_DIR
 from typing import Optional, List, Dict, Any
 from utils.data_structures import AlphaNode, AlphaFormula
 from alpha_library.library import AlphaLibrary
@@ -12,9 +14,9 @@ from config import (
     OPERATOR_PARAM_COUNT, OPERATOR_INPUT_COUNT, SHOW_DEBATE_LOG
 )
 
-formula_agent = FormulaAgent(prompt_path="prompts/formula_generation.txt")
-debate_agent = DebateAgent(prompt_path="prompts/debate_turn.txt")
-synthesizer_agent = SynthesizerAgent(prompt_path="prompts/debate_synthesis.txt")
+formula_agent = FormulaAgent(prompt_path=os.path.join(PROMPT_DIR, "formula_generation.txt"))
+debate_agent = DebateAgent(prompt_path=os.path.join(PROMPT_DIR, "debate_turn.txt"))
+synthesizer_agent = SynthesizerAgent(prompt_path=os.path.join(PROMPT_DIR, "debate_synthesis.txt"))
 
 
 # 增强的校验函数

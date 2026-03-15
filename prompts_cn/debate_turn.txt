@@ -1,0 +1,62 @@
+任务：参与多智能体辩论以优化 Alpha 因子
+
+背景：
+你是一个团队的一员，正在辩论如何改进现有的量化 Alpha 因子。
+你的目标是基于你分配的角色（Persona）和提供的上下文，贡献建设性的想法或批评。
+
+你必须严格且仅使用下列可用的工具及其正确用法。
+如果不这样做，你的贡献将被视为无效。
+
+可用数据字段：{available_fields}
+可用算子列表：{available_operators}
+
+【关键规则 1】：绝对禁止提出或使用任何未在“可用算子列表”中明确列出的算子。
+请仔细检查列表。没有任何例外（例如：不要使用 median, quantile, iqr, decay_mean 或自定义数学函数）。
+违反此规则是不可接受的。
+
+【关键规则 2】：严格遵循每个算子所需的准确参数数量。
+例如：ts_mean 只需要 1 个输入和 1 个参数（窗口）。
+提供更多或更少参数（例如：ts_mean(vwap, 30, 0.9)）是无效的并将被拒绝。
+
+【关键规则 3】：确保算子的 input 列表仅包含有效的变量名（来自可用数据字段或之前的步骤）。
+绝对不要在 input 列表中包含常量数字（如 2）。
+
+你的角色：{persona}
+
+当前 Alpha 因子详情：
+{current_alpha_portrait}
+
+优化目标：针对 '{factor_type}' 概念，提升 '{optimization_target}' 维度。
+约束条件：
+避免使用子表达式：{fsa_avoid_list}
+总参数数量最多 3 个。输出必须无量纲。
+仅使用可用算子，并确保语法（输入和参数）完全正确。
+
+辩论历史（前几轮）：
+{debate_history}
+
+你的任务：
+1. 分析...
+2. 建议/批评：
+    * 主 Agent (Main Agent)：提出具体的改进思路。
+    你的建议必须仅使用“可用算子列表”中的算子，并且使用完全正确的输入/参数数量。
+    在输出前请仔细复核。无效的建议是无用的。
+    * 评审 Agent (Critic Agent)：找出缺陷... 你的首要核心任务是仔细验证建议是否符合可用算子列表及其确切的参数数量要求。
+    如果发现违规，请明确指出 'INVALID OPERATOR'（无效算子）或 'INVALID SYNTAX (parameter count)'（无效语法-参数数量）。
+    这种验证比提出替代方案更重要。
+
+输出格式：包含 "analysis" 和 "contribution" 的 JSON。
+
+输出示例（Critic Agent - 捕捉无效语法）：
+{{
+  "analysis": "Agent A 建议使用 'ts_mean(vwap, 30, 0.9)'...",
+  "contribution": "Critique: Agent A 的建议存在 INVALID SYNTAX (parameter count)。'ts_mean' 只需要 1 个参数（窗口），但提供了 2 个 (30, 0.9)。建议必须修正为有效语法。"
+}}
+
+输出示例（Critic Agent - 捕捉无效算子）：
+{{
+  "analysis": "Agent B 建议使用 'ts_median'...",
+  "contribution": "Critique: Agent B 的建议存在 INVALID OPERATOR。'ts_median' 不在可用算子列表中。建议必须修改，仅使用允许的算子。"
+}}
+
+你的 JSON 回复：

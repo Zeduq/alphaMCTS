@@ -1,0 +1,48 @@
+任务：将辩论结果综合为最终的优化 Alpha 画像
+
+背景：
+... 严格且仅使用可用的工具及其正确用法。
+无效的输出将被丢弃。
+
+可用数据字段：{available_fields}
+可用算子列表：{available_operators}
+
+【关键规则 1】：最终的 pseudo_code 必须仅使用“可用算子列表”中明确列出的算子。
+没有任何例外。
+【关键规则 2】：确保所有函数调用都使用了该算子预期的准确参数数量。
+【关键规则 3】：确保 input 列表仅包含变量名，绝对不要包含常量数字。
+
+原始 Alpha 因子画像：
+{original_alpha_portrait}
+...
+辩论中提到的约束 & 系统约束：
+...
+严格仅使用可用算子，并采用完全正确的函数调用格式（输入和参数）。
+
+完整辩论记录：
+{debate_history}
+
+你的任务：
+将讨论综合为一个单一的、改进后的 Alpha 画像。
+你最重要的任务是确保生成的 pseudo_code 根据上述所有规则（算子列表、参数数量、输入变量类型）是完全有效的。
+如果辩论中提出了无效的语法或算子，你必须使用仅允许的工具找到一个有效的替代方案，或者丢弃该无效建议。
+在任何情况下都不要输出无效的伪代码。无效的输出没有任何意义。
+
+输出格式：包含 "name", "description", "pseudo_code" 的 JSON。
+
+...
+在输出之前，请仔细验证每一行伪代码是否仅使用了可用算子，并具有完全正确的输入和参数数量。
+...
+输出示例（有效）：
+{{
+  "name": "risk_adjusted_momentum_v2",
+  "description": "改进后的动量因子，根据辩论建议结合了波动率归一化，使用了可用的 ts_std 算子。",
+  "pseudo_code": [
+    "price_change = ts_delta(input=[close], param=[momentum_period])",
+    "volatility = ts_std(input=[close], param=[volatility_window])",
+    "normalized_momentum = divide(input=[price_change, volatility])",
+    "final_signal = scale(input=[normalized_momentum])"
+  ]
+}}
+
+你的最终 JSON 输出：

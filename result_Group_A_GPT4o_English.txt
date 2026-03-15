@@ -1,0 +1,88 @@
+==================== RUN START: 2025-11-26 18:51:50 ====================
+Factor Type: 波动率因子
+--- Alpha 1 ---
+Name: normalized_price_volatility
+Q-Value: 6.5700
+In Library: No
+Formula: (ts_std((high - low), 20) / ts_mean((high - low), 20))
+Scores: {"Effectiveness": 1.83, "Stability": 1.42, "Turnover": 9.38, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.018335750576543335, "rank_ic_std": 0.12893113750373386, "icir": -0.14221351747565503, "turnover": 0.06193659445993904, "annualized_return": -0.05860794859756724, "sharpe_ratio": -0.4167908958113303, "max_drawdown": -0.9664534450151674}
+--- Alpha 2 ---
+Name: enhanced_normalized_price_volatility
+Q-Value: 5.8580
+In Library: No
+Formula: (ts_std((high - low), 20) / (ts_mean((high - low), 20) + abs(ts_delta(volume, 10))))
+Scores: {"Effectiveness": 1.16, "Stability": 0.55, "Turnover": 8.43, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.011608691474895707, "rank_ic_std": 0.21229799999157956, "icir": 0.05468111557978005, "turnover": 0.15695508591176655, "annualized_return": 0.045845338769361144, "sharpe_ratio": 0.32794493343512415, "max_drawdown": -0.9666109482310953}
+--- Alpha 3 ---
+Name: stabilized_normalized_price_volatility
+Q-Value: 6.5700
+In Library: No
+Formula: (ts_std(decay_linear((high - low), 20), 20) / ts_mean(decay_linear((high - low), 20), 20))
+Scores: {"Effectiveness": 1.9, "Stability": 1.52, "Turnover": 9.81, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.01896999415325953, "rank_ic_std": 0.1251729097557324, "icir": -0.15155031699972754, "turnover": 0.019481823758882078, "annualized_return": -0.09229763094453558, "sharpe_ratio": -0.704381391626035, "max_drawdown": -0.975726380649049}
+--- Alpha 4 ---
+Name: volume_adjusted_normalized_volatility
+Q-Value: 6.5700
+In Library: Yes
+Formula: (ts_std(decay_linear(((high - low) * volume), 20), 20) / ts_mean(decay_linear(((high - low) * volume), 20), 20))
+Scores: {"Effectiveness": 2.26, "Stability": 1.8, "Turnover": 9.79, "Diversity": 10.0, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.022591751105684222, "rank_ic_std": 0.12529165068661552, "icir": -0.18031330086145653, "turnover": 0.02141208753747914, "annualized_return": -0.09358211344084288, "sharpe_ratio": -0.7017442068189463, "max_drawdown": -0.9750828113341712}
+--- Alpha 5 ---
+Name: stability_refined_normalized_volatility
+Q-Value: 5.4340
+In Library: Yes
+Formula: (ts_std(decay_linear(((high - low) * ts_std(volume, 20)), 15), 30) / ts_mean(decay_linear(((high - low) * ts_std(volume, 20)), 15), 30))
+Scores: {"Effectiveness": 2.42, "Stability": 1.86, "Turnover": 9.91, "Diversity": 3.98, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.024218438241022443, "rank_ic_std": 0.13044477326124998, "icir": -0.18566047251673817, "turnover": 0.00919337120232011, "annualized_return": -0.10570169017077569, "sharpe_ratio": -0.8135355748856717, "max_drawdown": -0.9856014763415608}
+--- Alpha 6 ---
+Name: stabilized_normalized_price_volatility
+Q-Value: 5.0600
+In Library: No
+Formula: decay_linear((ts_std(decay_linear((high - low), 20), 20) / ts_mean(decay_linear((high - low), 20), 20)), 20)
+Scores: {"Effectiveness": 1.98, "Stability": 1.48, "Turnover": 9.94, "Diversity": 3.9, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.019784018661893183, "rank_ic_std": 0.1335750152419879, "icir": -0.14811167062981015, "turnover": 0.006008004512657816, "annualized_return": -0.09271062447794942, "sharpe_ratio": -0.6798314692834465, "max_drawdown": -0.9641138993366501}
+--- Alpha 7 ---
+Name: stabilized_volume_weighted_price_ratio
+Q-Value: 4.9080
+In Library: Yes
+Formula: (ts_std(decay_linear(((vwap / close) * volume), 20), 20) / ts_mean(decay_linear(((vwap / close) * volume), 20), 20))
+Scores: {"Effectiveness": 2.49, "Stability": 2.02, "Turnover": 9.82, "Diversity": 1.21, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.024862408476836222, "rank_ic_std": 0.12308390370180625, "icir": -0.20199561217257175, "turnover": 0.017872161735793424, "annualized_return": -0.10646516946196183, "sharpe_ratio": -0.8094433100274555, "max_drawdown": -0.983067776006562}
+--- Alpha 8 ---
+Name: volume_weighted_vwap_volatility
+Q-Value: 5.7860
+In Library: No
+Formula: (ts_std(vwap, 30) / (vwap * volume))
+Scores: {"Effectiveness": 0.82, "Stability": 0.42, "Turnover": 9.5, "Diversity": 9.15, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.008239625999472392, "rank_ic_std": 0.19609527345849978, "icir": 0.04201848343487059, "turnover": 0.050109861194924665, "annualized_return": 0.007009076146219151, "sharpe_ratio": 0.1302332962346071, "max_drawdown": -0.9243449567723961}
+--- Alpha 9 ---
+Name: stability_enhanced_price_volatility
+Q-Value: 5.8580
+In Library: No
+Formula: (ts_std((high - low), 20) / (ts_mean((high - low), 20) + abs(ts_mean(volume, 10))))
+Scores: {"Effectiveness": 0.81, "Stability": 0.36, "Turnover": 9.99, "Diversity": 9.13, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.008149227471321479, "rank_ic_std": 0.22778951608877374, "icir": 0.03577525257196462, "turnover": 0.0012196904728040137, "annualized_return": 0.02243060856259249, "sharpe_ratio": 0.2121806204790676, "max_drawdown": -0.9838790569318309}
+--- Alpha 10 ---
+Name: smoothed_volume_weighted_vwap_volatility
+Q-Value: 5.7860
+In Library: No
+Formula: (decay_linear(ts_std(vwap, 30), 30) / (vwap * volume))
+Scores: {"Effectiveness": 0.91, "Stability": 0.46, "Turnover": 9.5, "Diversity": 9.06, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": 0.009129896613153382, "rank_ic_std": 0.199419860729628, "icir": 0.045782283568694446, "turnover": 0.05004547477936816, "annualized_return": 0.005582270421009339, "sharpe_ratio": 0.12388178380796736, "max_drawdown": -0.9197429643157657}
+--- Alpha 11 ---
+Name: volume_adjusted_normalized_volatility_v2
+Q-Value: 5.1560
+In Library: Yes
+Formula: (ts_std(decay_linear(sma(decay_linear(((high - low) * volume), 20), 5), 30), 20) / ts_mean(decay_linear(sma(decay_linear(((high - low) * volume), 20), 5), 30), 20))
+Scores: {"Effectiveness": 2.69, "Stability": 2.03, "Turnover": 9.89, "Diversity": 2.17, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.026919013054238137, "rank_ic_std": 0.13273845255091637, "icir": -0.2027973999765624, "turnover": 0.011109772142972263, "annualized_return": -0.12618163685844297, "sharpe_ratio": -1.0153193155120954, "max_drawdown": -0.9946186068353197}
+--- Alpha 12 ---
+Name: smoothed_normalized_price_volatility
+Q-Value: 5.3280
+In Library: No
+Formula: sma((ts_std((high - low), 10) / ts_mean((high - low), 10)), 5)
+Scores: {"Effectiveness": 0.55, "Stability": 0.46, "Turnover": 9.66, "Diversity": 6.97, "Overfitting Risk": 9.0}
+Financial Metrics: {"rank_ic_mean": -0.0055075464261364225, "rank_ic_std": 0.12073538797614045, "icir": -0.04561667062539126, "turnover": 0.03389349853161794, "annualized_return": 0.014246624689527199, "sharpe_ratio": 0.17887352668899587, "max_drawdown": -0.7655184389792591}
+==================== RUN END ====================
+

@@ -1,0 +1,51 @@
+任务描述：
+请根据以下要求设计一个量化投资 Alpha 表达式。
+
+可用数据字段：
+
+以下数据字段可供使用：{available_fields}
+
+可用算子列表：
+
+以下算子可供使用：{available_operators}
+
+Alpha 因子要求：
+
+{alpha_portrait_prompt}
+
+格式要求：
+
+请以 JSON 格式提供输出。
+JSON 对象应包含两个字段："formula" 和 "arguments"。
+
+* "formula": 代表计算 Alpha 的数学表达式。
+* "arguments": 代表 Alpha 的可配置参数。
+
+关于 "formula"：
+它是一个字典列表。
+每个字典代表一个单独的操作，并且必须包含四个键："name", "param", "input", 和 "output"。
+* "name": 算子的名称（字符串），必须是“可用算子列表”中提供的算子之一。
+* "param": 一个字符串列表，代表该算子的参数名称。
+    这些参数名称必须用作 "arguments" 部分中的键。
+* "input": 一个字符串列表，代表该算子的输入变量名称。
+    这些必须是来自“可用数据字段”的数据字段，或者是 "formula" 中先前操作的输出变量，不能是数值类型。
+* "output": 一个字符串，代表该算子的输出变量名称。
+    此输出可以用作后续操作的输入。
+
+关于 "arguments"：
+它是一个字典列表。
+每个字典代表 Alpha 的一组参数值。
+* "arguments" 中每个字典的键必须与 "formula" 的 "param" 列表中定义的参数名称完全对应。
+* "arguments" 中每个字典的值是参数的具体数值。
+* 你可以在 "arguments" 字段中包含最多 3 组参数。
+* 表示回溯窗口长度（如果适用）的参数值必须在 {window_range} 范围内。
+
+确保 Alpha 表达式既合理又在计算上可行。
+参数名称应具有描述性，并遵循 Python 命名规范（例如：window_size, lag_period, smoothing_factor）。
+避免使用单个字符或数字作为参数名称。
+
+请参考以下示例：
+{{
+"formula": [......],
+"arguments": [......]
+}}

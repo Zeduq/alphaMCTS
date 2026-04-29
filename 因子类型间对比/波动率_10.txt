@@ -1,0 +1,95 @@
+==================== RUN START: 2026-03-17 05:24:44 ====================
+Factor Type: 波动率因子
+--- Alpha 1 ---
+Name: normalized_volatility_skew
+Q-Value: 6.1860
+In Library: No
+Formula: scale(rank(sma((ts_std((high - low), 20) / ts_std((close - open), 20)), 5)))
+Scores: {"Effectiveness": 1.64, "Stability": 1.3, "Turnover": 9.85, "Diversity": 9.97, "Overfitting Risk": 5.0}
+Financial Metrics: {"rank_ic_mean": -0.01635593164222101, "rank_ic_std": 0.1258308029481151, "icir": -0.12998352755457812, "turnover": 0.014891342126529206, "annualized_return": -0.07153687857110591, "sharpe_ratio": -0.5373952775560882, "max_drawdown": -0.9556635721854719, "excess_return": -0.1745932777585928, "information_ratio": -0.3597782456453658}
+--- Alpha 2 ---
+Name: normalized_volatility_skew_v2
+Q-Value: 4.5700
+In Library: No
+Formula: scale(ts_rank((ts_std((high - low), 20) / ts_std((close - open), 20)), 10))
+Scores: {"Effectiveness": 0.43, "Stability": 0.44, "Turnover": 5.0, "Diversity": 9.98, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": -0.004299163185659905, "rank_ic_std": 0.09810216214192309, "icir": -0.04382332755765732, "turnover": 0.5, "annualized_return": -0.01672950618257807, "sharpe_ratio": -0.1483477575531085, "max_drawdown": -0.7002086127497787, "excess_return": 0.04182835100416393, "information_ratio": 0.286102596217644}
+--- Alpha 3 ---
+Name: normalized_volatility_skew
+Q-Value: 6.1860
+In Library: No
+Formula: scale(rank(ts_mean((ts_std((high - low), 20) - ts_std((close - open), 20)), 5)))
+Scores: {"Effectiveness": 1.18, "Stability": 0.56, "Turnover": 9.96, "Diversity": 9.97, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.01177471539645889, "rank_ic_std": 0.21080967600310646, "icir": -0.05585471985776108, "turnover": 0.00444481080690351, "annualized_return": -0.10664176580728679, "sharpe_ratio": -0.4793989705732832, "max_drawdown": -0.9972564723853126, "excess_return": -0.24912908628629604, "information_ratio": -0.2601481085324481}
+--- Alpha 4 ---
+Name: normalized_volatility_skew
+Q-Value: 6.1860
+In Library: No
+Formula: scale(rank(ts_mean((((ts_std((high - low), 20) - ts_std((close - open), 20)) * rank(ts_mean(volume, 20))) + ts_corr((high - low), vwap, 15)), 5)))
+Scores: {"Effectiveness": 1.91, "Stability": 1.16, "Turnover": 9.89, "Diversity": 9.97, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.01914546462879954, "rank_ic_std": 0.16499612365217264, "icir": -0.11603584499451625, "turnover": 0.011415453220284144, "annualized_return": -0.11704624683185616, "sharpe_ratio": -0.6929189967530597, "max_drawdown": -0.9942626499440257, "excess_return": -0.26278454250820016, "information_ratio": -0.44467647843714087}
+--- Alpha 5 ---
+Name: normalized_volatility_skew
+Q-Value: 5.5700
+In Library: No
+Formula: scale(ts_rank(decay_linear(((abs((ts_std((high - low), 20) - ts_std((close - open), 20))) * abs(ts_corr((ts_mean((high + low), 1) - vwap), volume, 15))) * (sign((ts_std((high - low), 20) - ts_std((close - open), 20))) * sign(ts_corr((ts_mean((high + low), 1) - vwap), volume, 15)))), 10), 30))
+Scores: {"Effectiveness": 0.38, "Stability": 0.38, "Turnover": 9.13, "Diversity": 9.96, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.0038116589774287515, "rank_ic_std": 0.0996620868751903, "icir": 0.038245827444915954, "turnover": 0.08687439417505005, "annualized_return": 0.012052255312744897, "sharpe_ratio": 0.1745021627154847, "max_drawdown": -0.427701353839952, "excess_return": -0.15428954505166514, "information_ratio": -0.45874894176268494}
+--- Alpha 6 ---
+Name: stable_range_volume_correlation_alpha
+Q-Value: 5.1880
+In Library: Yes
+Formula: scale(ts_rank(decay_linear(ts_corr((high - low), log(volume), 20), 10), 30))
+Scores: {"Effectiveness": 2.12, "Stability": 0.82, "Turnover": 5.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.02120554002929546, "rank_ic_std": 0.2570848906613523, "icir": -0.08248458310694219, "turnover": 0.5, "annualized_return": 0.018446259579907087, "sharpe_ratio": 0.19690023116116237, "max_drawdown": -0.713458867643163, "excess_return": -0.06550622774767922, "information_ratio": 0.04637026203714067}
+--- Alpha 7 ---
+Name: normalized_volatility_skew_v2
+Q-Value: 5.6560
+In Library: No
+Formula: scale(rank(ts_mean((ts_std(((high - low) / vwap), 20) - ts_std(((close - open) / vwap), 20)), 5)))
+Scores: {"Effectiveness": 0.74, "Stability": 0.49, "Turnover": 9.95, "Diversity": 9.1, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.007364118887111061, "rank_ic_std": 0.14883839549993544, "icir": -0.04947727945047792, "turnover": 0.004876421958641686, "annualized_return": -0.09448721565791018, "sharpe_ratio": -0.6250499043012607, "max_drawdown": -0.9898281565439467, "excess_return": -0.27174093562269397, "information_ratio": -0.56694699725597}
+--- Alpha 8 ---
+Name: normalized_volatility_skew_v2
+Q-Value: 5.9720
+In Library: No
+Formula: scale(sma(((ts_std((high - low), 20) - ts_std((close - open), 20)) / (ts_std((high - low), 20) + ts_std((close - open), 20))), 5))
+Scores: {"Effectiveness": 1.63, "Stability": 1.3, "Turnover": 9.85, "Diversity": 7.91, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.016290015651031272, "rank_ic_std": 0.12574732661990212, "icir": -0.12954562207331285, "turnover": 0.01468299932288808, "annualized_return": -0.0681480424714711, "sharpe_ratio": -0.509632343445424, "max_drawdown": -0.9525616824342109, "excess_return": -0.14831384455748386, "information_ratio": -0.2745475255482204}
+--- Alpha 9 ---
+Name: normalized_volatility_skew_v3
+Q-Value: 5.9720
+In Library: No
+Formula: scale(decay_linear((((ts_std((high - low), 10) - ts_std((close - open), 10)) / (ts_std((high - low), 10) + ts_std((close - open), 10))) - ((ts_std((high - low), 30) - ts_std((close - open), 30)) / (ts_std((high - low), 30) + ts_std((close - open), 30)))), 5))
+Scores: {"Effectiveness": 1.84, "Stability": 1.76, "Turnover": 9.52, "Diversity": 8.74, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.01837154617476572, "rank_ic_std": 0.1041123883002251, "icir": 0.17645879106901632, "turnover": 0.047691531359683736, "annualized_return": 0.10759779435147387, "sharpe_ratio": 1.0781780202500206, "max_drawdown": -0.5214683220855691, "excess_return": 0.6747807286801637, "information_ratio": 1.8450686722547707}
+--- Alpha 10 ---
+Name: normalized_volatility_skew_v4
+Q-Value: 4.7400
+In Library: No
+Formula: scale(decay_linear(((ts_corr((high - low), (close - open), 10) - ts_corr((high - low), (close - open), 30)) + (ts_corr((vwap - close), (high - low), 10) - ts_corr((vwap - close), (high - low), 30))), 5))
+Scores: {"Effectiveness": 1.13, "Stability": 0.86, "Turnover": 5.0, "Diversity": 8.71, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.01125333554357528, "rank_ic_std": 0.131433656728231, "icir": 0.08561989237539142, "turnover": 0.5, "annualized_return": 0.04166400424876082, "sharpe_ratio": 0.455979571076502, "max_drawdown": -0.6865970645790692, "excess_return": 0.3716555301701876, "information_ratio": 1.1362296244238819}
+--- Alpha 11 ---
+Name: stable_range_volume_correlation_alpha
+Q-Value: 4.3840
+In Library: Yes
+Formula: scale(ts_corr((decay_linear((high - low), 10) / ts_mean(close, 20)), rank(volume), 30))
+Scores: {"Effectiveness": 2.98, "Stability": 1.15, "Turnover": 5.0, "Diversity": 4.79, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.029817774621293272, "rank_ic_std": 0.25844291481797327, "icir": -0.1153747033161832, "turnover": 0.5, "annualized_return": -0.016674068412399046, "sharpe_ratio": -0.013203095452344176, "max_drawdown": -0.880210641146698, "excess_return": -0.2529584879354039, "information_ratio": -0.423999827641351}
+--- Alpha 12 ---
+Name: normalized_volatility_skew_v2
+Q-Value: 4.5840
+In Library: No
+Formula: scale(ts_rank(decay_linear((((ts_std((high / low), 20) - ts_std((close / open), 20)) * rank(ts_mean(volume, 20))) + ts_corr((high / low), vwap, 15)), 10), 10))
+Scores: {"Effectiveness": 0.54, "Stability": 0.51, "Turnover": 5.0, "Diversity": 8.87, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.005359424573813967, "rank_ic_std": 0.10495562079706527, "icir": -0.0510637213434864, "turnover": 0.5, "annualized_return": -0.023633712222931313, "sharpe_ratio": -0.22029699307451178, "max_drawdown": -0.7695956750169661, "excess_return": 0.05914996466086575, "information_ratio": 0.34094591550353603}
+--- Alpha 13 ---
+Name: normalized_volatility_skew
+Q-Value: 5.6540
+In Library: No
+Formula: scale(rank(decay_linear((((high - vwap) - (vwap - low)) / ts_std(((high - vwap) - (vwap - low)), 20)), 10)))
+Scores: {"Effectiveness": 1.12, "Stability": 0.59, "Turnover": 9.92, "Diversity": 8.64, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.011223871660730548, "rank_ic_std": 0.18980845871730184, "icir": 0.059132621046395155, "turnover": 0.007871760278844286, "annualized_return": -0.08704929906758863, "sharpe_ratio": -0.4515828136065705, "max_drawdown": -0.985838216441532, "excess_return": -0.2934696765961715, "information_ratio": -0.5296891165532498}
+==================== RUN END ====================
+

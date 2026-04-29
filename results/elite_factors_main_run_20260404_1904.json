@@ -1,0 +1,21 @@
+[
+    {
+        "Rank": 1,
+        "Node_ID": "node_0",
+        "Mode": "main_run",
+        "Name": "Unknown",
+        "Description": "No description",
+        "Formula_Steps": [],
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0,
+            "Normal_IC_Mean": 0,
+            "ICIR": 0,
+            "Turnover": 0,
+            "Annualized_Return": 0,
+            "Sharpe_Ratio": 0,
+            "Max_Drawdown": 0
+        },
+        "Five_Dimensions_Scores": {},
+        "Q_Value": 0.0
+    }
+]

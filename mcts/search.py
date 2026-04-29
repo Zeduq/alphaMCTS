@@ -97,23 +97,92 @@ class MCTS:
         return current_node
 
     # 确认 expand 方法使用了 SHOW_DEBATE_LOG
-    def expand(self, node_to_expand: AlphaNode, freq_subtrees: List[str], alpha_repo: AlphaLibrary) -> Optional[
-        AlphaNode]:
+    def expand(self, node_to_expand: AlphaNode, freq_subtrees: List[str], alpha_repo: AlphaLibrary,
+               ablation_mode: str = "debate") -> Optional[AlphaNode]:
+        """
+        扩展MCTS节点
+        
+        Args:
+            node_to_expand: 待扩展的节点
+            freq_subtrees: 频繁子树列表（FSA规避）
+            alpha_repo: Alpha因子库
+            ablation_mode: 扩展模式
+                - "debate": 使用多智能体辩论（默认）
+                - "refiner": 使用单智能体优化（Baseline）
+        
+        Returns:
+            新创建的AlphaNode，如果扩展失败则返回None
+        """
         print(f"\n--- 正在扩展节点: {node_to_expand.portrait.get('name', '未命名')} ---")
         print(f"--- FSA: 当前规避列表: {freq_subtrees} ---")
+        print(f"--- 扩展模式: {ablation_mode} ---")
 
         refinement_dim = get_refinement_dimension(node_to_expand.scores)
         print(f"优化目标维度: {refinement_dim}")
 
         current_factor_type = node_to_expand.portrait.get('factor_type', '综合型')
 
-        # --- 编排辩论 ---
+        # --- 根据模式选择优化策略 ---
+        if ablation_mode == "refiner":
+            # Baseline模式：使用单智能体Refiner
+            new_portrait = self._expand_by_refiner(node_to_expand, refinement_dim, 
+                                                    current_factor_type, freq_subtrees)
+        else:
+            # 本方法模式：使用多智能体辩论
+            new_portrait = self._expand_by_debate(node_to_expand, refinement_dim,
+                                                  current_factor_type, freq_subtrees)
+
+        if not new_portrait:
+            return None
+
+        new_portrait['factor_type'] = current_factor_type
+
+        # --- 生成公式与评估 ---
+        return self._generate_and_evaluate(node_to_expand, new_portrait, refinement_dim, alpha_repo)
+
+    def _expand_by_refiner(self, node_to_expand: AlphaNode, refinement_dim: str,
+                           factor_type: str, freq_subtrees: List[str]) -> Optional[Dict[str, Any]]:
+        """使用Refiner Agent进行单智能体优化（Baseline模式）"""
+        from agents.refiner_agent import RefinerAgent
+
+        print("\n--- [Baseline] 使用Refiner Agent进行优化 ---")
+
+        refiner_agent = RefinerAgent(
+            prompt_path=os.path.join(PROMPT_DIR, "alpha_refinement.txt")
+        )
+
+        # 构建优化建议
+        suggestions = f"请重点优化因子的{refinement_dim}维度，保持{factor_type}类型特征。"
+        if freq_subtrees:
+            suggestions += f" 避免使用以下常见结构: {freq_subtrees}"
+
+        # 调用Refiner Agent
+        new_portrait = refiner_agent.execute(
+            original_formula=node_to_expand.formula,
+            original_portrait=node_to_expand.portrait,
+            suggestions=suggestions,
+            freq_subtrees=freq_subtrees
+        )
+
+        if not new_portrait:
+            print("[Baseline] Refiner未能生成新画像，跳过本次扩展。")
+            return None
+
+        return new_portrait
+
+    def _expand_by_debate(self, node_to_expand: AlphaNode, refinement_dim: str,
+                          factor_type: str, freq_subtrees: List[str]) -> Optional[Dict[str, Any]]:
+        """使用多智能体辩论进行优化（本研究方法）"""
+        from config import DEBATE_ROUNDS
+
+        print("\n--- 开始因子优化辩论 ---")
+
         debate_history = ""
-        num_rounds = 2
+        num_rounds = DEBATE_ROUNDS
 
         personas = {
-            "Agent_A": f"你是一名积极的量化研究员(主Agent)，专注于最大化Alpha因子的 '{refinement_dim}' 表现，倾向于探索更有效的复杂结构。请针对 '{current_factor_type}' 类型进行思考。",
-            "Agent_B": f"你是一名谨慎的量化研究员(主Agent)，在提升 '{refinement_dim}' 的同时，高度关注简洁性、低换手率和过拟合风险。请确保优化后的因子仍然符合 '{current_factor_type}' 类型。",
+            "Agent_A": f"你是一名积极的量化研究员(主Agent)，专注于最大化Alpha因子的 '{refinement_dim}' 表现，倾向于探索更有效的复杂结构。请针对 '{factor_type}' 类型进行思考。",
+            "Agent_B": f"你是一名谨慎的量化研究员(主Agent)，在提升 '{refinement_dim}' 的同时，高度关注简洁性、低换手率和过拟合风险。请确保优化后的因子仍然符合 '{factor_type}' 类型。",
             "Critic": f"你是一名批判性的评审员(Critic Agent)，负责审视主Agent提出的优化建议。质疑其合理性、潜在风险（过拟合、换手率、偏离因子类型）、是否有效解决了 '{refinement_dim}' 问题，以及是否忽略了FSA规避列表 {freq_subtrees}。"
         }
         agent_ids = ["Agent_A", "Agent_B", "Critic"]
@@ -133,7 +202,7 @@ class MCTS:
                     persona=persona,
                     current_alpha_portrait=node_to_expand.portrait,
                     optimization_target=refinement_dim,
-                    factor_type=current_factor_type,
+                    factor_type=factor_type,
                     fsa_avoid_list=freq_subtrees,
                     debate_history=debate_history
                 )
@@ -159,7 +228,7 @@ class MCTS:
         new_portrait = synthesizer_agent.execute(
             original_alpha_portrait=node_to_expand.portrait,
             optimization_target=refinement_dim,
-            factor_type=current_factor_type,
+            factor_type=factor_type,
             fsa_avoid_list=freq_subtrees,
             debate_history=debate_history
         )
@@ -168,9 +237,12 @@ class MCTS:
             print("合成智能体未能生成最终画像，跳过本次扩展。")
             return None
 
-        new_portrait['factor_type'] = current_factor_type
+        return new_portrait
 
-        # --- 生成公式与评估 ---
+    def _generate_and_evaluate(self, parent_node: AlphaNode, new_portrait: Dict[str, Any],
+                               refinement_dim: str, alpha_repo: AlphaLibrary) -> Optional[AlphaNode]:
+        """生成公式并评估新节点"""
+        # --- 生成公式 ---
         print("--- 正在生成新公式 ---")
         new_formula = formula_agent.execute(alpha_portrait=new_portrait)
         if not new_formula:
@@ -186,8 +258,8 @@ class MCTS:
         new_node = AlphaNode(
             formula=new_formula,
             portrait=new_portrait,
-            parent=node_to_expand,
-            refinement_summary=f"经辩论优化(目标:{refinement_dim})。新思路: {new_portrait.get('description', '无')}"
+            parent=parent_node,
+            refinement_summary=f"经优化(目标:{refinement_dim})。新思路: {new_portrait.get('description', '无')}"
         )
 
         # 评估新节点
@@ -196,7 +268,7 @@ class MCTS:
         new_node.scores = new_scores
         new_node.q_value = np.mean(list(new_scores.values())) if new_scores else 0.0
 
-        node_to_expand.children.append(new_node)
+        parent_node.children.append(new_node)
         print(f"\n已创建新节点: '{new_node.portrait.get('name', '未命名')}', Q值为: {new_node.q_value:.2f}")
 
         print("--- 新节点详细信息 ---")

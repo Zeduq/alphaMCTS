@@ -6,6 +6,7 @@ from datetime import datetime
 from config import PROMPT_DIR
 from mcts.search import MCTS
 from utils.data_structures import AlphaNode, AlphaFormula
+from utils.exporter import export_elite_factors
 from agents.portrait_agent import PortraitAgent
 from agents.formula_agent import FormulaAgent
 from evaluation.evaluator import simulate_evaluation
@@ -68,25 +69,35 @@ def run_search(factor_type: str):
         effective_alpha_repository.add(root_node)
     max_score_overall = root_node.q_value
     search_budget = INITIAL_SEARCH_BUDGET
-    i = 0
-    while i < search_budget:
-        print(f"\n{'=' * 20} MCTS 迭代: {i + 1}/{search_budget} {'=' * 20}")
+    iteration_count = 0
+    success_count = 0
+    
+    while iteration_count < search_budget:
+        iteration_count += 1
+        print(f"\n{'=' * 20} MCTS 迭代: {iteration_count}/{search_budget} (成功: {success_count}) {'=' * 20}")
+        
         frequent_subtrees = mine_frequent_subtrees(effective_alpha_repository.alphas, top_k=3)
         node_to_expand = mcts.select()
         new_node = mcts.expand(node_to_expand, freq_subtrees=frequent_subtrees, alpha_repo=effective_alpha_repository)
+        
         if new_node:
+            success_count += 1
             mcts.backpropagate(new_node)
             is_new_node_effective = new_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD
             all_generated_nodes_data.append({
                 "node": new_node, "in_library": is_new_node_effective
             })
+            
+            # 发现更好的因子时增加预算
             if new_node.q_value > max_score_overall:
                 max_score_overall = new_node.q_value
                 search_budget += BUDGET_INCREMENT
                 print(f"*** 发现新的最佳Alpha, Q值: {max_score_overall:.2f}。搜索预算增加至: {search_budget} ***")
+            
             if is_new_node_effective:
                 effective_alpha_repository.add(new_node)
-        i += 1
+        else:
+            print("[INFO] 本次扩展未产生有效节点，继续下一次迭代...")
 
     print("\n\n--- MCTS 搜索完成 ---")
     print(f"总共生成因子数: {len(all_generated_nodes_data)}")
@@ -124,8 +135,13 @@ def run_search(factor_type: str):
 
     print("\n所有生成因子的结果已追加到 result.txt 文件中。")
 
-    # [修改] 最终打印到控制台的逻辑
+    # 👉 [新增] 将所有满足 THRESHOLD 并入库的有效 Alpha (AlphaNode对象集合) 进行双轨导出
+    if effective_alpha_repository.alphas:
+        export_elite_factors(effective_alpha_repository.alphas, mode="main_run", save_dir="results")
+
+    # 最终打印到控制台的逻辑保持不变，但要增加普通IC指标的显示
     best_alphas = effective_alpha_repository.get_best_alphas(n=10)
+
     print(f"\n--- 仓库中排名前 {len(best_alphas)} 的Alpha ---")
     for idx, alpha_data in enumerate(best_alphas):
         portrait = alpha_data.get('portrait', {})
@@ -155,7 +171,8 @@ def run_search(factor_type: str):
         print(f"     夏普比率: {financial_metrics.get('sharpe_ratio', 0.0):.4f}")
         print(f"     最大回撤: {financial_metrics.get('max_drawdown', 0.0):.4f}")
         print(f"     因子换手率: {financial_metrics.get('turnover', 0.0):.4f}")
-        print(f"     (原始IC): {financial_metrics.get('rank_ic_mean', 0.0):.4f}")
+        print(f"     (原始Rank IC): {financial_metrics.get('rank_ic_mean', 0.0):.4f}")
+        print(f"     (原始普通IC): {financial_metrics.get('ic_mean', 0.0):.4f}")
 
         print("-" * 25)
 

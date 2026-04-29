@@ -11,13 +11,18 @@ class AlphaFormula:
     description: str
     formula_steps: List[Dict[str, Any]]
     arguments: List[Dict[str, Any]]
+    
+    # 常量定义
+    INVALID_OP_MARKER = "INVALID_OPERATION"
+    EMPTY_FORMULA_MARKER = "EMPTY_FORMULA_STEPS"
+    NO_FINAL_FORMULA_MARKER = "NO_FINAL_FORMULA"
 
     def to_expression_string(self) -> str:
         """
         将结构化的 formula_steps 转换为单行数学表达式字符串。
         """
         if not self.formula_steps:
-            return "公式步骤为空"
+            return self.EMPTY_FORMULA_MARKER
 
         # 使用第一组参数进行转换
         params = self.arguments[0] if self.arguments else {}
@@ -45,7 +50,7 @@ class AlphaFormula:
                     op_symbol = {"add": "+", "subtract": "-", "multiply": "*", "divide": "/"}[op_name]
                     current_expr = f"({input_exprs[0]} {op_symbol} {input_exprs[1]})"
                 else:
-                    current_expr = "无效的二元运算"
+                    current_expr = self.INVALID_OP_MARKER
             else:
                 # 处理函数式操作符
                 all_args = input_exprs + param_values
@@ -55,7 +60,7 @@ class AlphaFormula:
 
         # 最后一个步骤的输出就是最终的公式
         final_output_var = self.formula_steps[-1].get("output")
-        return expressions.get(final_output_var, "未能生成最终公式")
+        return expressions.get(final_output_var, self.NO_FINAL_FORMULA_MARKER)
 
 @dataclass
 class AlphaNode:

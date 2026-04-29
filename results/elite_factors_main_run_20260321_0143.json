@@ -1,0 +1,38 @@
+[
+    {
+        "Rank": 1,
+        "Node_ID": "node_0",
+        "Mode": "main_run",
+        "Name": "Unknown",
+        "Description": "No description",
+        "Formula_Steps": [],
+        "Q_Value": 0.0
+    },
+    {
+        "Rank": 2,
+        "Node_ID": "node_1",
+        "Mode": "main_run",
+        "Name": "Unknown",
+        "Description": "No description",
+        "Formula_Steps": [],
+        "Q_Value": 0.0
+    },
+    {
+        "Rank": 3,
+        "Node_ID": "node_2",
+        "Mode": "main_run",
+        "Name": "Unknown",
+        "Description": "No description",
+        "Formula_Steps": [],
+        "Q_Value": 0.0
+    },
+    {
+        "Rank": 4,
+        "Node_ID": "node_3",
+        "Mode": "main_run",
+        "Name": "Unknown",
+        "Description": "No description",
+        "Formula_Steps": [],
+        "Q_Value": 0.0
+    }
+]

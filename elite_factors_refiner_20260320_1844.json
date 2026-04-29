@@ -1,0 +1,1817 @@
+[
+    {
+        "Rank": 1,
+        "Mode": "refiner",
+        "Name": "robust_volume_weighted_trend_stability_v2",
+        "Description": "通过多窗口价格动量与成交量加权，结合波动率标准化和秩转换提升因子在不同市场状态下的稳定性；所有子信号经线性衰减融合并确保无量纲，增强对极端值的鲁棒性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v1",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v2",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "volatility_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v6"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v8",
+                    "v9"
+                ],
+                "param": [],
+                "output": "v10"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v10"
+                ],
+                "param": [],
+                "output": "v11"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.142
+    },
+    {
+        "Rank": 2,
+        "Mode": "refiner",
+        "Name": "decay_weighted_volume_vwap_divergence",
+        "Description": "结合成交量变化率、VWAP偏离度与价格动量，通过线性衰减加权融合多个信号，并标准化为无量纲因子，以增强预测有效性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_long"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_long"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_long"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v7",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v3",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v10"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v10",
+                    "v9"
+                ],
+                "param": [],
+                "output": "v11"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v11"
+                ],
+                "param": [
+                    "lookback_decay"
+                ],
+                "output": "v12"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v12"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v13"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 3,
+        "Q_Value": 6.44
+    },
+    {
+        "Rank": 3,
+        "Mode": "refiner",
+        "Name": "stable_decay_weighted_volume_vwap_divergence",
+        "Description": "通过引入波动率标准化和价格动量平滑，增强原始因子在时间序列上的稳定性。使用线性衰减加权融合成交量变化率、VWAP偏离度与波动率调整后的价格动量，并确保输出为无量纲信号。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_vol"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_vol"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v3"
+                ],
+                "param": [
+                    "lookback_decay"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v5"
+                ],
+                "param": [
+                    "lookback_decay"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v8"
+                ],
+                "param": [
+                    "lookback_decay"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v9",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v12"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v12",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "stddev",
+                "input": [
+                    "v13"
+                ],
+                "param": [
+                    "lookback_norm"
+                ],
+                "output": "v14"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v13",
+                    "v14"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.44
+    },
+    {
+        "Rank": 4,
+        "Mode": "refiner",
+        "Name": "stable_divergence_factor_v2",
+        "Description": "通过标准化价格动量、成交量变化率与VWAP偏离度，并引入波动率归一化及线性衰减加权，提升因子在不同市场状态下的稳定性与无量纲特性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_vol"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_short"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_vol"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "lookback_vol"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v7",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v3",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v10"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v10",
+                    "v9"
+                ],
+                "param": [],
+                "output": "v11"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v11"
+                ],
+                "param": [
+                    "lookback_decay"
+                ],
+                "output": "v12"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v12"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.082
+    },
+    {
+        "Rank": 5,
+        "Mode": "refiner",
+        "Name": "stable_volume_weighted_momentum",
+        "Description": "通过波动率标准化和成交量加权的价格动量，结合多期信息衰减加权提升稳定性，消除量纲影响并增强跨市场环境下的鲁棒性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v3",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v4"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v7"
+                ],
+                "param": [],
+                "output": "v8"
+            }
+        ],
+        "Visits": 3,
+        "Q_Value": 6.13
+    },
+    {
+        "Rank": 6,
+        "Mode": "refiner",
+        "Name": "robust_volume_weighted_momentum",
+        "Description": "通过成交量加权的价格动量，并引入波动率标准化和线性衰减机制，提升在不同市场环境下的预测稳定性和有效性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "open"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v1",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v8"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 4,
+        "Q_Value": 6.16
+    },
+    {
+        "Rank": 7,
+        "Mode": "refiner",
+        "Name": "volatility_normalized_decay_volume_vwap_divergence",
+        "Description": "通过波动率标准化价格变动，并结合线性衰减加权的成交量变化率与VWAP偏离度，生成稳定且无量纲的动量信号。使用统一回溯窗口参数控制所有时间序列操作，提升因子在不同市场状态下的有效性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "1"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v1"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "1"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v7",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v6"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v9"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v3",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v12"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v12",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v13"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 6.346
+    },
+    {
+        "Rank": 8,
+        "Mode": "refiner",
+        "Name": "multi_window_volume_price_divergence",
+        "Description": "通过在多个时间窗口上计算标准化价格变动与成交量变动的背离信号，并结合VWAP偏离度，使用衰减线性加权融合各窗口信号，最终进行横截面标准化以提升因子有效性与稳定性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v1",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v7",
+                    "v6"
+                ],
+                "param": [],
+                "output": "norm_price_change_short"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v2",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v10"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v10",
+                    "v9"
+                ],
+                "param": [],
+                "output": "norm_volume_change_short"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "norm_price_change_short",
+                    "norm_volume_change_short"
+                ],
+                "param": [],
+                "output": "div_short"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "med_window"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "med_window"
+                ],
+                "output": "v12"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v11"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v13"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v11"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v14"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v11",
+                    "v13"
+                ],
+                "param": [],
+                "output": "v15"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v15",
+                    "v14"
+                ],
+                "param": [],
+                "output": "norm_price_change_med"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v12"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v16"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v12"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v17"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v12",
+                    "v16"
+                ],
+                "param": [],
+                "output": "v18"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v18",
+                    "v17"
+                ],
+                "param": [],
+                "output": "norm_volume_change_med"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "norm_price_change_med",
+                    "norm_volume_change_med"
+                ],
+                "param": [],
+                "output": "div_med"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v19"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v20"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v19"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v21"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v19"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v22"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v19",
+                    "v21"
+                ],
+                "param": [],
+                "output": "v23"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v23",
+                    "v22"
+                ],
+                "param": [],
+                "output": "norm_price_change_long"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v20"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v24"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v20"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v25"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "v20",
+                    "v24"
+                ],
+                "param": [],
+                "output": "v26"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v26",
+                    "v25"
+                ],
+                "param": [],
+                "output": "norm_volume_change_long"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "norm_price_change_long",
+                    "norm_volume_change_long"
+                ],
+                "param": [],
+                "output": "div_long"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "div_short"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "w_short"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "div_med"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "w_med"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "div_long"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "w_long"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "w_short",
+                    "w_med"
+                ],
+                "param": [],
+                "output": "v27"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v27",
+                    "w_long"
+                ],
+                "param": [],
+                "output": "raw_signal"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "raw_signal"
+                ],
+                "param": [],
+                "output": "v28"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v28"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.34
+    },
+    {
+        "Rank": 9,
+        "Mode": "refiner",
+        "Name": "stable_multi_window_volume_price_divergence",
+        "Description": "通过在多个时间窗口上计算标准化价格变动与成交量变动的背离信号，并结合VWAP偏移度，使用衰减线性加权融合各窗口信号；所有中间变量均进行横截面标准化以提升因子稳定性，并确保最终Alpha无量纲。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v12"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v14"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v9"
+                ],
+                "param": [],
+                "output": "v15"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v16"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v17"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v12"
+                ],
+                "param": [],
+                "output": "v18"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v13",
+                    "v16"
+                ],
+                "param": [],
+                "output": "v19"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v14",
+                    "v17"
+                ],
+                "param": [],
+                "output": "v20"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v15",
+                    "v18"
+                ],
+                "param": [],
+                "output": "v21"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v22"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "vwap"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v23"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v22",
+                    "v23"
+                ],
+                "param": [],
+                "output": "v24"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v19"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v25"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v20"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v26"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v21"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v27"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v25",
+                    "v26"
+                ],
+                "param": [],
+                "output": "v28"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v28",
+                    "v27"
+                ],
+                "param": [],
+                "output": "v29"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v29",
+                    "v24"
+                ],
+                "param": [],
+                "output": "v30"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v30"
+                ],
+                "param": [],
+                "output": "v31"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v31"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 6.34
+    },
+    {
+        "Rank": 10,
+        "Mode": "refiner",
+        "Name": "multi_window_volume_price_divergence_enhanced",
+        "Description": "在多个时间窗口上计算标准化价格动量、成交量变化率与VWAP偏离度，通过衰减线性加权融合，并对所有子信号进行横截面标准化以确保无量纲；引入价格-成交量相关性增强趋势确认，提升因子预测能力。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "delay",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "1"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "volume",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v10"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "vwap"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v10",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v12"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v13"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v3",
+                    "v13"
+                ],
+                "param": [],
+                "output": "v14"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v6",
+                    "v13"
+                ],
+                "param": [],
+                "output": "v15"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v14"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v16"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v15"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v17"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v9"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v18"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v12"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v19"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v16",
+                    "v17"
+                ],
+                "param": [],
+                "output": "v20"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v18",
+                    "v19"
+                ],
+                "param": [],
+                "output": "v21"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v20",
+                    "v21"
+                ],
+                "param": [],
+                "output": "v22"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v22"
+                ],
+                "param": [],
+                "output": "v23"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v23"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 6.318
+    }
+]

@@ -1,0 +1,252 @@
+[
+    {
+        "Rank": 1,
+        "Node_ID": "node_placeholder_0",
+        "Mode": "debate",
+        "Name": "crowd_agreement_score",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "(sign(ts_delta(close, 10)) * (ts_mean((close * volume), 10) / ts_mean(close, 10)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0029,
+            "ICIR": 0.0182,
+            "Turnover": 0.272,
+            "Annualized_Return": 0.0748,
+            "Sharpe_Ratio": 0.5928,
+            "Max_Drawdown": -0.4451
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.29,
+            "Stability": 0.18,
+            "Turnover": 7.28,
+            "Diversity": 9.68,
+            "Overfitting Risk": 7.0
+        },
+        "Visits": 1,
+        "Q_Value": 6.378
+    },
+    {
+        "Rank": 2,
+        "Node_ID": "node_placeholder_1",
+        "Mode": "debate",
+        "Name": "crowd_agreement_score_v2",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "(sign(ts_delta(close, 10)) * (ts_mean(((vwap / close) * rank(volume)), 10) / ts_mean(((high - low) / close), 10)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0086,
+            "ICIR": 0.0555,
+            "Turnover": 0.2797,
+            "Annualized_Return": 0.0945,
+            "Sharpe_Ratio": 0.7427,
+            "Max_Drawdown": -0.6069
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.86,
+            "Stability": 0.56,
+            "Turnover": 7.2,
+            "Diversity": 9.55,
+            "Overfitting Risk": 8.0
+        },
+        "Visits": 1,
+        "Q_Value": 6.378
+    },
+    {
+        "Rank": 3,
+        "Node_ID": "node_placeholder_2",
+        "Mode": "debate",
+        "Name": "normalized_volume_weighted_momentum",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale((ts_delta(close, 10) / ts_std(close, 20)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0016,
+            "ICIR": 0.0091,
+            "Turnover": 0.1708,
+            "Annualized_Return": 0.0674,
+            "Sharpe_Ratio": 0.4792,
+            "Max_Drawdown": -0.5763
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.16,
+            "Stability": 0.09,
+            "Turnover": 8.29,
+            "Diversity": 9.22,
+            "Overfitting Risk": 6.0
+        },
+        "Visits": 1,
+        "Q_Value": 6.136
+    },
+    {
+        "Rank": 4,
+        "Node_ID": "node_placeholder_3",
+        "Mode": "debate",
+        "Name": "stable_volume_weighted_momentum",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale((decay_linear((ts_delta(close, 10) * volume), 5) / ts_std(close, 20)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": -0.0027,
+            "ICIR": -0.0155,
+            "Turnover": 0.0668,
+            "Annualized_Return": 0.0658,
+            "Sharpe_Ratio": 0.4823,
+            "Max_Drawdown": -0.5749
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.27,
+            "Stability": 0.15,
+            "Turnover": 9.33,
+            "Diversity": 9.67,
+            "Overfitting Risk": 8.0
+        },
+        "Visits": 1,
+        "Q_Value": 6.136
+    },
+    {
+        "Rank": 5,
+        "Node_ID": "node_placeholder_4",
+        "Mode": "debate",
+        "Name": "normalized_price_stability",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale((scale(decay_linear(abs((close - vwap)), 20)) - scale(ts_rank(abs((close - vwap)), 30))))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0179,
+            "ICIR": 0.0985,
+            "Turnover": 0.0652,
+            "Annualized_Return": 0.0121,
+            "Sharpe_Ratio": 0.1563,
+            "Max_Drawdown": -0.8968
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 1.79,
+            "Stability": 0.99,
+            "Turnover": 9.35,
+            "Diversity": 9.3,
+            "Overfitting Risk": 8.0
+        },
+        "Visits": 1,
+        "Q_Value": 5.886
+    },
+    {
+        "Rank": 6,
+        "Node_ID": "node_placeholder_5",
+        "Mode": "debate",
+        "Name": "normalized_volatility_skew",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale(ts_rank(decay_linear(((abs((ts_std((high - low), 20) - ts_std((close - open), 20))) * abs(ts_corr((ts_mean((high + low), 1) - vwap), volume, 15))) * (sign((ts_std((high - low), 20) - ts_std((close - open), 20))) * sign(ts_corr((ts_mean((high + low), 1) - vwap), volume, 15)))), 10), 30))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0038,
+            "ICIR": 0.0382,
+            "Turnover": 0.0869,
+            "Annualized_Return": 0.0121,
+            "Sharpe_Ratio": 0.1745,
+            "Max_Drawdown": -0.4277
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.38,
+            "Stability": 0.38,
+            "Turnover": 9.13,
+            "Diversity": 9.96,
+            "Overfitting Risk": 8.0
+        },
+        "Visits": 1,
+        "Q_Value": 5.57
+    },
+    {
+        "Rank": 7,
+        "Node_ID": "node_placeholder_6",
+        "Mode": "debate",
+        "Name": "direction_consistency_normalized_vwap_momentum",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale((ts_mean(sign(ts_delta(vwap, 10)), 10) / ts_std(vwap, 10)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.005,
+            "ICIR": 0.0303,
+            "Turnover": 0.0394,
+            "Annualized_Return": 0.1046,
+            "Sharpe_Ratio": 0.7968,
+            "Max_Drawdown": -0.76
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.5,
+            "Stability": 0.3,
+            "Turnover": 9.61,
+            "Diversity": 8.31,
+            "Overfitting Risk": 6.0
+        },
+        "Visits": 1,
+        "Q_Value": 5.058
+    },
+    {
+        "Rank": 8,
+        "Node_ID": "node_placeholder_7",
+        "Mode": "debate",
+        "Name": "crowd_agreement_score",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "(ts_rank(ts_delta(ts_mean(vwap, 20), 1), 20) * decay_linear((volume / ts_mean(volume, 10)), 5))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0102,
+            "ICIR": 0.0654,
+            "Turnover": 0.1547,
+            "Annualized_Return": 0.0982,
+            "Sharpe_Ratio": 0.7105,
+            "Max_Drawdown": -0.4803
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 1.02,
+            "Stability": 0.65,
+            "Turnover": 8.45,
+            "Diversity": 8.1,
+            "Overfitting Risk": 7.0
+        },
+        "Visits": 1,
+        "Q_Value": 5.044
+    },
+    {
+        "Rank": 9,
+        "Node_ID": "node_placeholder_8",
+        "Mode": "debate",
+        "Name": "enhanced_stable_volume_weighted_momentum",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "scale((decay_linear((((ts_mean(vwap, 10) - delay(ts_mean(vwap, 10), 1)) * (high - low)) * volume), 5) / ts_std((((ts_mean(vwap, 10) - delay(ts_mean(vwap, 10), 1)) * (high - low)) * volume), 5)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0007,
+            "ICIR": 0.004,
+            "Turnover": 0.1198,
+            "Annualized_Return": 0.0508,
+            "Sharpe_Ratio": 0.3894,
+            "Max_Drawdown": -0.6901
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.07,
+            "Stability": 0.04,
+            "Turnover": 8.8,
+            "Diversity": 8.02,
+            "Overfitting Risk": 8.0
+        },
+        "Visits": 1,
+        "Q_Value": 4.986
+    },
+    {
+        "Rank": 10,
+        "Node_ID": "node_placeholder_9",
+        "Mode": "debate",
+        "Name": "normalized_volume_weighted_momentum_v2",
+        "Description": "No description available (Parsed)",
+        "Formula_Steps": "rank(((ts_delta((close - vwap), 10) * volume) / ts_std(close, 20)))",
+        "Financial_Metrics": {
+            "Rank_IC_Mean": 0.0022,
+            "ICIR": 0.0125,
+            "Turnover": 0.1907,
+            "Annualized_Return": 0.0777,
+            "Sharpe_Ratio": 0.5604,
+            "Max_Drawdown": -0.532
+        },
+        "Five_Dimensions_Scores": {
+            "Effectiveness": 0.22,
+            "Stability": 0.13,
+            "Turnover": 8.09,
+            "Diversity": 7.68,
+            "Overfitting Risk": 7.0
+        },
+        "Visits": 1,
+        "Q_Value": 4.624
+    }
+]

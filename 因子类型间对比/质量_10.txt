@@ -1,0 +1,81 @@
+==================== RUN START: 2026-03-17 16:42:18 ====================
+Factor Type: 质量因子
+--- Alpha 1 ---
+Name: normalized_price_stability
+Q-Value: 6.2140
+In Library: No
+Formula: scale((ts_std(log(close), 20) / ts_mean(close, 20)))
+Scores: {"Effectiveness": 1.43, "Stability": 0.78, "Turnover": 9.98, "Diversity": 10.0, "Overfitting Risk": 5.0}
+Financial Metrics: {"rank_ic_mean": -0.014318642187197098, "rank_ic_std": 0.1826949622383357, "icir": -0.07837458686199368, "turnover": 0.001911417219307876, "annualized_return": -0.026905335926912022, "sharpe_ratio": -0.06349880324987908, "max_drawdown": -0.986601569038466, "excess_return": 0.15729775780777544, "information_ratio": 0.5405651688853821}
+--- Alpha 2 ---
+Name: normalized_price_stability
+Q-Value: 6.2140
+In Library: Yes
+Formula: scale(ts_mean((log(high) - log(low)), 10))
+Scores: {"Effectiveness": 2.83, "Stability": 1.38, "Turnover": 9.86, "Diversity": 10.0, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": -0.028346517696565238, "rank_ic_std": 0.20559589532749892, "icir": -0.13787492036945267, "turnover": 0.01392383112972162, "annualized_return": 0.00791619870610294, "sharpe_ratio": 0.1385340736835719, "max_drawdown": -0.9347540874339602, "excess_return": -0.07015431958117846, "information_ratio": 0.14135382990092538}
+--- Alpha 3 ---
+Name: normalized_price_stability
+Q-Value: 4.4400
+In Library: No
+Formula: scale(ts_std((log(close) - log(decay_linear(close, 20))), 10))
+Scores: {"Effectiveness": 1.26, "Stability": 0.72, "Turnover": 9.44, "Diversity": 2.78, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.012624809967247994, "rank_ic_std": 0.17418225957624878, "icir": -0.07248045810154075, "turnover": 0.05559233182033818, "annualized_return": 0.07783967034182426, "sharpe_ratio": 0.5390237952572979, "max_drawdown": -0.7096458031381462, "excess_return": 0.19318900304406417, "information_ratio": 0.6129899320495008}
+--- Alpha 4 ---
+Name: normalized_price_stability
+Q-Value: 4.8460
+In Library: No
+Formula: scale(ts_std(ts_rank(((close - vwap) / vwap), 20), 20))
+Scores: {"Effectiveness": 0.65, "Stability": 0.54, "Turnover": 9.3, "Diversity": 7.74, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": -0.006522224388871866, "rank_ic_std": 0.12091790960057765, "icir": -0.053939275086845435, "turnover": 0.06961588771179239, "annualized_return": 0.01113222129970981, "sharpe_ratio": 0.15187394742117308, "max_drawdown": -0.6485918665539745, "excess_return": -0.08400962185160654, "information_ratio": -0.05887633802109553}
+--- Alpha 5 ---
+Name: normalized_price_stability
+Q-Value: 5.8860
+In Library: No
+Formula: scale(decay_linear(abs((close - vwap)), 10))
+Scores: {"Effectiveness": 1.14, "Stability": 0.57, "Turnover": 10.0, "Diversity": 9.23, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.01143159088382448, "rank_ic_std": 0.20130824632430033, "icir": 0.056786500764646274, "turnover": 3.527862153895889e-05, "annualized_return": 0.047270441310416356, "sharpe_ratio": 0.337209620275426, "max_drawdown": -0.9741717747026549, "excess_return": -0.18910131760667703, "information_ratio": -0.10515728838936732}
+--- Alpha 6 ---
+Name: composite_price_stability
+Q-Value: 5.3660
+In Library: No
+Formula: scale((ts_std((log(vwap) - log(close)), 20) / ts_std(log(close), 20)))
+Scores: {"Effectiveness": 1.61, "Stability": 1.32, "Turnover": 9.58, "Diversity": 8.32, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": -0.016059024536203306, "rank_ic_std": 0.12188175090377663, "icir": -0.13175905676709226, "turnover": 0.041556682004652234, "annualized_return": -0.1350647757343224, "sharpe_ratio": -1.239164705172366, "max_drawdown": -0.9907481817466479, "excess_return": -0.46203202431050494, "information_ratio": -1.817306144429427}
+--- Alpha 7 ---
+Name: normalized_price_stability
+Q-Value: 5.8860
+In Library: No
+Formula: scale((scale(decay_linear(abs((close - vwap)), 20)) - scale(ts_rank(abs((close - vwap)), 30))))
+Scores: {"Effectiveness": 1.79, "Stability": 0.99, "Turnover": 9.35, "Diversity": 9.3, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.017948201352237802, "rank_ic_std": 0.18217296888464493, "icir": 0.09852285694263957, "turnover": 0.06520027447628796, "annualized_return": 0.012094643929712046, "sharpe_ratio": 0.15631601916352322, "max_drawdown": -0.8968356954551978, "excess_return": -0.2607502778679609, "information_ratio": -0.41386571177862486}
+--- Alpha 8 ---
+Name: normalized_price_stability
+Q-Value: 5.1320
+In Library: Yes
+Formula: scale((ts_std(log(vwap), 20) * abs(ts_corr(volume, vwap, 20))))
+Scores: {"Effectiveness": 3.0, "Stability": 2.16, "Turnover": 9.14, "Diversity": 5.36, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": -0.029999319432165713, "rank_ic_std": 0.13883451952393808, "icir": -0.21607968634193445, "turnover": 0.08621293003960018, "annualized_return": -0.060464489607245264, "sharpe_ratio": -0.4017959486745078, "max_drawdown": -0.9505315419712587, "excess_return": -0.25684593213340956, "information_ratio": -0.6023531122665189}
+--- Alpha 9 ---
+Name: composite_price_stability
+Q-Value: 5.2420
+In Library: No
+Formula: scale(decay_linear((rank((ts_std((log(vwap) - log(close)), 20) / ts_std(log(close), 20))) + rank((ts_rank((high - low), 10) * ts_corr(vwap, close, 15)))), 5))
+Scores: {"Effectiveness": 0.88, "Stability": 0.71, "Turnover": 9.17, "Diversity": 7.45, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.008805217001979188, "rank_ic_std": 0.12335079733707176, "icir": -0.07138354345548178, "turnover": 0.08264362210538578, "annualized_return": -0.06019559193273927, "sharpe_ratio": -0.4792338256026702, "max_drawdown": -0.905890412527957, "excess_return": -0.22093314533388897, "information_ratio": -0.5839949738646468}
+--- Alpha 10 ---
+Name: normalized_price_stability
+Q-Value: 5.9780
+In Library: No
+Formula: scale(ts_mean((abs((close - vwap)) / vwap), 20))
+Scores: {"Effectiveness": 1.22, "Stability": 1.15, "Turnover": 10.0, "Diversity": 9.52, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.012189624863555714, "rank_ic_std": 0.10642413321616195, "icir": 0.11453816437289577, "turnover": 1.0569379541691681e-05, "annualized_return": 0.06535873025842731, "sharpe_ratio": 0.6848575587477407, "max_drawdown": -0.5577662413605391, "excess_return": 0.16312544572371945, "information_ratio": 0.6368534441014749}
+--- Alpha 11 ---
+Name: normalized_price_stability
+Q-Value: 4.6160
+In Library: No
+Formula: scale(ts_mean((ts_std(log(close), 20) + ts_std(log(vwap), 20)), 10))
+Scores: {"Effectiveness": 1.18, "Stability": 0.62, "Turnover": 9.94, "Diversity": 3.34, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.011816912343561912, "rank_ic_std": 0.1915408005007417, "icir": -0.06169396970603218, "turnover": 0.006067326196874445, "annualized_return": 0.05165213677094771, "sharpe_ratio": 0.3778647241129895, "max_drawdown": -0.8581067927486551, "excess_return": 0.07999724322052537, "information_ratio": 0.40205012770946297}
+==================== RUN END ====================
+

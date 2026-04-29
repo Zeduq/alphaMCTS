@@ -1,0 +1,109 @@
+==================== RUN START: 2026-03-17 14:50:27 ====================
+Factor Type: 情绪/另类因子
+--- Alpha 1 ---
+Name: crowd_agreement_score
+Q-Value: 6.3780
+In Library: No
+Formula: (sign(ts_delta(close, 10)) * (ts_mean((close * volume), 10) / ts_mean(close, 10)))
+Scores: {"Effectiveness": 0.29, "Stability": 0.18, "Turnover": 7.28, "Diversity": 9.68, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": 0.002854418903736284, "rank_ic_std": 0.15661188616142188, "icir": 0.01822606810822901, "turnover": 0.27196263571695145, "annualized_return": 0.07475537787495545, "sharpe_ratio": 0.5927723221907384, "max_drawdown": -0.4451270814042489, "excess_return": 0.6396797643695764, "information_ratio": 1.4480640339695214}
+--- Alpha 2 ---
+Name: crowd_agreement_score
+Q-Value: 5.1040
+In Library: No
+Formula: scale((sign(ts_delta(decay_linear(close, 10), 1)) * ts_corr(close, volume, 30)))
+Scores: {"Effectiveness": 0.78, "Stability": 0.6, "Turnover": 6.68, "Diversity": 9.46, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.00781257521208587, "rank_ic_std": 0.13103548778185986, "icir": 0.059621827218988066, "turnover": 0.331781141124288, "annualized_return": 0.12051034961962315, "sharpe_ratio": 1.0167295902068008, "max_drawdown": -0.3675654276119673, "excess_return": 0.8154562102709606, "information_ratio": 1.846226910535863}
+--- Alpha 3 ---
+Name: crowd_agreement_score_v2
+Q-Value: 3.8600
+In Library: No
+Formula: (sign(ts_delta(vwap, 1)) * ts_corr(rank(close), rank(volume), 20))
+Scores: {"Effectiveness": 0.42, "Stability": 0.45, "Turnover": 0.79, "Diversity": 9.64, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.004198552965942243, "rank_ic_std": 0.09349948473523673, "icir": -0.04490455725859154, "turnover": 0.9214430497276906, "annualized_return": 0.008002014004388824, "sharpe_ratio": 0.13162908450130376, "max_drawdown": -0.37159507355550153, "excess_return": 0.05493118192978286, "information_ratio": 0.32763992518365437}
+--- Alpha 4 ---
+Name: crowd_agreement_score_v2
+Q-Value: 6.3780
+In Library: No
+Formula: (sign(ts_delta(close, 10)) * (ts_mean(((vwap / close) * rank(volume)), 10) / ts_mean(((high - low) / close), 10)))
+Scores: {"Effectiveness": 0.86, "Stability": 0.56, "Turnover": 7.2, "Diversity": 9.55, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.008556016639386972, "rank_ic_std": 0.15415485974586246, "icir": 0.05550273701064177, "turnover": 0.27974416808282265, "annualized_return": 0.09448469461970421, "sharpe_ratio": 0.7426726474025002, "max_drawdown": -0.6068947938289567, "excess_return": 0.9141284907583493, "information_ratio": 1.8425271079954193}
+--- Alpha 5 ---
+Name: crowd_agreement_score_v3
+Q-Value: 6.3780
+In Library: No
+Formula: scale(((decay_linear(((vwap / close) * ts_rank(ts_delta(close, 5), 10)), 8) * rank(volume)) / ts_std(((high - low) / close), 20)))
+Scores: {"Effectiveness": 0.85, "Stability": 0.47, "Turnover": 9.74, "Diversity": 9.99, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.00853412722730601, "rank_ic_std": 0.18216871171266644, "icir": -0.0468473820068884, "turnover": 0.026317833332358043, "annualized_return": -0.07157718450779194, "sharpe_ratio": -0.36896108000398536, "max_drawdown": -0.9848434752118257, "excess_return": -0.1451445008866208, "information_ratio": -0.11008334761401851}
+--- Alpha 6 ---
+Name: crowd_agreement_score_v3
+Q-Value: 6.3780
+In Library: Yes
+Formula: scale(((decay_linear((((vwap / close) * ts_rank(ts_delta(close, 10), 10)) * ts_corr(close, volume, 15)), 8) * rank(volume)) / ts_std(((high - low) / close), 20)))
+Scores: {"Effectiveness": 2.76, "Stability": 1.64, "Turnover": 9.62, "Diversity": 9.87, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.027618770666564565, "rank_ic_std": 0.16797911527213527, "icir": -0.16441788386503084, "turnover": 0.037616092495117326, "annualized_return": -0.10453051495045451, "sharpe_ratio": -0.6251362552750741, "max_drawdown": -0.9928533074541442, "excess_return": -0.21577031049490336, "information_ratio": -0.3253123978846166}
+--- Alpha 7 ---
+Name: crowd_agreement_score_v3
+Q-Value: 5.2740
+In Library: No
+Formula: (ts_corr(decay_linear(close, 10), delay(decay_linear(close, 10), 1), 20) * rank((vwap / ts_mean(close, 20))))
+Scores: {"Effectiveness": 1.18, "Stability": 1.08, "Turnover": 9.96, "Diversity": 6.15, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.011756502365339984, "rank_ic_std": 0.10835591381328379, "icir": -0.10849894529613305, "turnover": 0.003913592435951796, "annualized_return": -0.06430380726394325, "sharpe_ratio": -0.6008818633773635, "max_drawdown": -0.9286060241893026, "excess_return": -0.21273190658409458, "information_ratio": -0.5912198368809801}
+--- Alpha 8 ---
+Name: crowd_agreement_score_v2
+Q-Value: 4.4400
+In Library: No
+Formula: (sign(ts_delta(sma(close, 5), 1)) * (ts_mean(((vwap / close) * ts_mean(rank(volume), 10)), 15) / ts_mean((high / low), 20)))
+Scores: {"Effectiveness": 0.7, "Stability": 0.47, "Turnover": 5.87, "Diversity": 7.16, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.006980629454738844, "rank_ic_std": 0.14775187401728285, "icir": -0.047245623794404834, "turnover": 0.4128075301701478, "annualized_return": -0.005791484153099158, "sharpe_ratio": 0.024161385512558708, "max_drawdown": -0.6563399053847176, "excess_return": 0.23398872598518516, "information_ratio": 0.7249750716804465}
+--- Alpha 9 ---
+Name: crowd_agreement_score
+Q-Value: 5.0440
+In Library: No
+Formula: (ts_rank(ts_delta(ts_mean(vwap, 20), 1), 20) * decay_linear((volume / ts_mean(volume, 10)), 5))
+Scores: {"Effectiveness": 1.02, "Stability": 0.65, "Turnover": 8.45, "Diversity": 8.1, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": 0.010190782896678949, "rank_ic_std": 0.15573310880931526, "icir": 0.06543748451818861, "turnover": 0.15472649005121974, "annualized_return": 0.09816069671053684, "sharpe_ratio": 0.710506963152379, "max_drawdown": -0.4802595121403863, "excess_return": 1.0902924907757736, "information_ratio": 1.956887039773898}
+--- Alpha 10 ---
+Name: crowd_agreement_score_v3
+Q-Value: 4.8180
+In Library: Yes
+Formula: scale(((decay_linear((((vwap / close) * ((close - ts_min(low, 20)) / (ts_max(high, 20) - ts_min(low, 20)))) * ts_corr(close, volume, 20)), 10) * rank(volume)) / ts_std(((high / vwap) - (low / vwap)), 20)))
+Scores: {"Effectiveness": 2.68, "Stability": 1.68, "Turnover": 9.72, "Diversity": 2.01, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.026837972676200125, "rank_ic_std": 0.16003274010599053, "icir": -0.16770301288614564, "turnover": 0.027632454289436503, "annualized_return": -0.10985016515919965, "sharpe_ratio": -0.6693773680858279, "max_drawdown": -0.9913211799704926, "excess_return": -0.3115928866959421, "information_ratio": -0.5998001659030309}
+--- Alpha 11 ---
+Name: crowd_agreement_score
+Q-Value: 4.5380
+In Library: No
+Formula: (sign(ts_delta(close, 5)) * ts_corr(ts_rank(vwap, 20), ts_rank(volume, 20), 20))
+Scores: {"Effectiveness": 0.29, "Stability": 0.24, "Turnover": 5.78, "Diversity": 8.38, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.002894992453586999, "rank_ic_std": 0.12293081843816048, "icir": 0.0235497696213851, "turnover": 0.4215976374832727, "annualized_return": 0.053726074516452726, "sharpe_ratio": 0.5110493278464028, "max_drawdown": -0.47504425206460643, "excess_return": 0.21755025404741546, "information_ratio": 0.7382989403436522}
+--- Alpha 12 ---
+Name: crowd_agreement_score_v4
+Q-Value: 5.1980
+In Library: No
+Formula: (ts_mean(abs(decay_linear(sign(ts_delta(close, 1)), 10)), 20) * rank((vwap / ts_mean(close, 20))))
+Scores: {"Effectiveness": 0.76, "Stability": 0.77, "Turnover": 9.96, "Diversity": 6.5, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.007554218403545391, "rank_ic_std": 0.09813473301897689, "icir": -0.07697802980810665, "turnover": 0.0035229961317515546, "annualized_return": -0.019850003255189486, "sharpe_ratio": -0.17210496310500153, "max_drawdown": -0.7964440479696799, "excess_return": 0.024469372124875433, "information_ratio": 0.22990536875791176}
+--- Alpha 13 ---
+Name: crowd_agreement_score_v2
+Q-Value: 4.6800
+In Library: No
+Formula: (sign(ts_delta(close, 10)) * (sma(((vwap / close) * ts_rank(volume, 10)), 10) / sma(((high - low) / vwap), 10)))
+Scores: {"Effectiveness": 0.74, "Stability": 0.53, "Turnover": 7.22, "Diversity": 6.91, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.007431737369577349, "rank_ic_std": 0.14121294478777668, "icir": 0.052627876153607665, "turnover": 0.2781119576042087, "annualized_return": 0.07955498062050048, "sharpe_ratio": 0.6659978341191064, "max_drawdown": -0.6245220975063408, "excess_return": 0.6441408518547469, "information_ratio": 1.4814041180320012}
+--- Alpha 14 ---
+Name: crowd_agreement_score
+Q-Value: 5.1940
+In Library: No
+Formula: (sign(ts_delta(close, 5)) * scale(decay_linear((vwap - close), 10)))
+Scores: {"Effectiveness": 1.19, "Stability": 0.81, "Turnover": 5.9, "Diversity": 9.34, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.011853266264675552, "rank_ic_std": 0.14552961015011479, "icir": 0.08144917211314472, "turnover": 0.40950297603644026, "annualized_return": 0.04937658688080959, "sharpe_ratio": 0.4323834382600402, "max_drawdown": -0.6165201079576912, "excess_return": 0.04456383938365538, "information_ratio": 0.30445886105746556}
+--- Alpha 15 ---
+Name: crowd_agreement_score_v2
+Q-Value: 5.1940
+In Library: No
+Formula: (sign(ts_delta(close, 5)) * scale((decay_linear((vwap - close), 10) * scale(volume))))
+Scores: {"Effectiveness": 1.44, "Stability": 1.06, "Turnover": 5.94, "Diversity": 9.53, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.014449863634939103, "rank_ic_std": 0.13597928152711916, "icir": 0.10626518593611836, "turnover": 0.4058717445316634, "annualized_return": 0.043058577391944075, "sharpe_ratio": 0.3998424058370974, "max_drawdown": -0.5311655492197472, "excess_return": -0.014264735870874068, "information_ratio": 0.13940617251419207}
+==================== RUN END ====================
+

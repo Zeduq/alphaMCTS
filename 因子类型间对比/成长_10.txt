@@ -1,0 +1,109 @@
+==================== RUN START: 2026-03-18 03:18:49 ====================
+Factor Type: 成长因子
+--- Alpha 1 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.5560
+In Library: No
+Formula: ts_rank(((ts_delta(close, 5) / delay(close, 1)) * (volume / ts_mean(volume, 20))), 10)
+Scores: {"Effectiveness": 1.5, "Stability": 1.0, "Turnover": 5.0, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": -0.014999848802386622, "rank_ic_std": 0.15020287452610856, "icir": -0.09986392637099178, "turnover": 0.5, "annualized_return": -0.09922798099251073, "sharpe_ratio": -0.7303065585644515, "max_drawdown": -0.9751890726586004, "excess_return": -0.3725889058857642, "information_ratio": -1.0153684783931174}
+--- Alpha 2 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.1580
+In Library: Yes
+Formula: ts_rank(ts_corr(ts_rank(ts_delta(close, 10), 10), (volume / ts_mean(volume, 20)), 15), 15)
+Scores: {"Effectiveness": 2.01, "Stability": 0.78, "Turnover": 5.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.020127257130515015, "rank_ic_std": 0.2581541725678389, "icir": -0.07796603452235848, "turnover": 0.5, "annualized_return": 0.0007785690860697692, "sharpe_ratio": 0.08044306562717143, "max_drawdown": -0.8181729206201245, "excess_return": -0.21188052796050405, "information_ratio": -0.3516075685818863}
+--- Alpha 3 ---
+Name: volume_confirmed_growth_score
+Q-Value: 4.9320
+In Library: Yes
+Formula: decay_linear(ts_corr(ts_rank(ts_delta(vwap, 10), 10), (volume / ts_mean(volume, 20)), 15), 15)
+Scores: {"Effectiveness": 2.97, "Stability": 1.59, "Turnover": 5.0, "Diversity": 7.1, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.029720299285760293, "rank_ic_std": 0.18677100801000524, "icir": -0.1591269416084545, "turnover": 0.5, "annualized_return": -0.04338444979527434, "sharpe_ratio": -0.24673100984657592, "max_drawdown": -0.866020140400765, "excess_return": -0.2173921287197078, "information_ratio": -0.45276210896182456}
+--- Alpha 4 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.1900
+In Library: No
+Formula: ts_rank(decay_linear(((sign(ts_delta(close, 10)) * (volume / ts_mean(volume, 10))) * ts_corr(close, volume, 10)), 5), 20)
+Scores: {"Effectiveness": 0.87, "Stability": 0.73, "Turnover": 8.02, "Diversity": 8.45, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 0.008667510597118256, "rank_ic_std": 0.11918572830810929, "icir": 0.07272272209229372, "turnover": 0.19783918909352782, "annualized_return": 0.017601867698806783, "sharpe_ratio": 0.21343689485535747, "max_drawdown": -0.481004834253797, "excess_return": 0.08808515329358868, "information_ratio": 0.4260496133643909}
+--- Alpha 5 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.1900
+In Library: No
+Formula: ts_rank(decay_linear(((sign((ts_mean(close, 20) - delay(close, 20))) * ts_rank(volume, 20)) * ts_corr(ts_delta(close, 1), ts_delta(volume, 1), 10)), 5), 20)
+Scores: {"Effectiveness": 0.57, "Stability": 0.59, "Turnover": 7.97, "Diversity": 8.82, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.005677104012132098, "rank_ic_std": 0.09663806842097597, "icir": 0.058746041853831615, "turnover": 0.2029251142546531, "annualized_return": 0.019608480227296, "sharpe_ratio": 0.2597803171159354, "max_drawdown": -0.326976860249036, "excess_return": 0.5244962329728846, "information_ratio": 1.7150743755463962}
+--- Alpha 6 ---
+Name: volume_confirmed_growth_score
+Q-Value: 4.6040
+In Library: No
+Formula: ts_rank(decay_linear(((sign((ts_mean(vwap, 20) - delay(vwap, 20))) * ts_rank(volume, 20)) * (ts_corr(ts_delta(vwap, 1), ts_delta(volume, 1), 20) + (scale((ts_argmax(vwap, 20) - ts_argmin(vwap, 20))) + scale(decay_linear((high - low), 5))))), 5), 10)
+Scores: {"Effectiveness": 0.63, "Stability": 0.64, "Turnover": 5.0, "Diversity": 8.75, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.00626546140993889, "rank_ic_std": 0.0972732424392097, "icir": 0.06441094439567438, "turnover": 0.5, "annualized_return": 0.03488315282275023, "sharpe_ratio": 0.4464720938435196, "max_drawdown": -0.5103629102066023, "excess_return": 0.34328946642308855, "information_ratio": 1.1917638157088615}
+--- Alpha 7 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.5560
+In Library: No
+Formula: rank(ts_mean((ts_mean(ts_delta(close, 5), 10) * (volume / ts_mean(volume, 10))), 10))
+Scores: {"Effectiveness": 1.11, "Stability": 0.65, "Turnover": 9.63, "Diversity": 7.03, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.011090874885690563, "rank_ic_std": 0.17116355222657031, "icir": -0.06479694269846363, "turnover": 0.03732629009208066, "annualized_return": -0.003438031536221575, "sharpe_ratio": 0.057564173521333604, "max_drawdown": -0.7960244066098613, "excess_return": -0.08256622757008414, "information_ratio": 0.032815527411395484}
+--- Alpha 8 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.2660
+In Library: No
+Formula: rank(ts_mean(((ts_delta(close, 10) / stddev(close, 10)) * rank(volume)), 10))
+Scores: {"Effectiveness": 0.88, "Stability": 0.5, "Turnover": 9.77, "Diversity": 7.18, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.008807288620667503, "rank_ic_std": 0.17599212192607394, "icir": -0.050043652660583485, "turnover": 0.02330104453974091, "annualized_return": 0.043612060936118136, "sharpe_ratio": 0.3412786988534191, "max_drawdown": -0.7656135112088509, "excess_return": 0.5429099722537647, "information_ratio": 1.1833750724174616}
+--- Alpha 9 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.5560
+In Library: No
+Formula: rank(ts_mean((ts_delta(close, 5) * ts_corr(ts_delta(close, 5), ts_delta(volume, 5), 10)), 5))
+Scores: {"Effectiveness": 0.79, "Stability": 0.68, "Turnover": 8.53, "Diversity": 8.54, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.007945513942799437, "rank_ic_std": 0.11707191025328995, "icir": 0.06786866230856733, "turnover": 0.14701183029781129, "annualized_return": 0.06590330949282852, "sharpe_ratio": 0.6554873854569236, "max_drawdown": -0.46087362775115337, "excess_return": 0.1990954242377725, "information_ratio": 0.708562230950393}
+--- Alpha 10 ---
+Name: volume_confirmed_growth_score
+Q-Value: 3.9360
+In Library: No
+Formula: ts_rank(ts_corr(ts_rank(ts_delta(close, 20), 20), ((volume - ts_min(volume, 30)) / (ts_max(volume, 30) - ts_min(volume, 30))), 20), 20)
+Scores: {"Effectiveness": 1.57, "Stability": 0.61, "Turnover": 5.0, "Diversity": 4.5, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.015651791982929205, "rank_ic_std": 0.25720024661639557, "icir": -0.06085449834841434, "turnover": 0.5, "annualized_return": 0.0179256820183733, "sharpe_ratio": 0.19472636475121782, "max_drawdown": -0.8225435472805808, "excess_return": -0.10731870108460628, "information_ratio": -0.06663163329208076}
+--- Alpha 11 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.5560
+In Library: No
+Formula: rank(ts_mean((decay_linear(ts_delta(close, 5), 5) * ts_corr(decay_linear(ts_delta(close, 5), 5), decay_linear(ts_delta(volume, 5), 5), 5)), 5))
+Scores: {"Effectiveness": 1.22, "Stability": 1.11, "Turnover": 8.54, "Diversity": 8.91, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.012231148772283172, "rank_ic_std": 0.1104682756276694, "icir": 0.11072091695816777, "turnover": 0.1456095422894278, "annualized_return": 0.0943658439501438, "sharpe_ratio": 0.9599673457297387, "max_drawdown": -0.4432830807041801, "excess_return": 0.34451729994345803, "information_ratio": 1.0773768366438317}
+--- Alpha 12 ---
+Name: volume_confirmed_growth_score
+Q-Value: 4.5660
+In Library: No
+Formula: ts_rank((ts_rank((close - delay(close, 10)), 10) * ts_rank(volume, 10)), 5)
+Scores: {"Effectiveness": 0.51, "Stability": 0.42, "Turnover": 5.0, "Diversity": 8.9, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.005104391578926832, "rank_ic_std": 0.12211876687211627, "icir": -0.04179858435904606, "turnover": 0.5, "annualized_return": -0.033015719652693565, "sharpe_ratio": -0.29467828510822514, "max_drawdown": -0.7338498732883416, "excess_return": -0.1553442161197407, "information_ratio": -0.4274794931487253}
+--- Alpha 13 ---
+Name: volume_confirmed_growth_score
+Q-Value: 4.3160
+In Library: No
+Formula: ts_rank((ts_rank(ts_delta(sma(vwap, 10), 10), 10) * ts_rank(volume, 10)), 10)
+Scores: {"Effectiveness": 0.16, "Stability": 0.13, "Turnover": 5.0, "Diversity": 8.29, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.0015504522800580559, "rank_ic_std": 0.12325135037768625, "icir": -0.012579596696562879, "turnover": 0.5, "annualized_return": -0.020150473292669502, "sharpe_ratio": -0.1418437661795348, "max_drawdown": -0.7714200443103204, "excess_return": -0.1910647376780935, "information_ratio": -0.489350619233212}
+--- Alpha 14 ---
+Name: volume_confirmed_growth_score
+Q-Value: 5.2660
+In Library: No
+Formula: rank(ts_mean(((ts_delta(close, 10) / stddev(close, 10)) * rank(volume)), 10))
+Scores: {"Effectiveness": 0.88, "Stability": 0.5, "Turnover": 9.77, "Diversity": 7.18, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.008807288620667503, "rank_ic_std": 0.17599212192607394, "icir": -0.050043652660583485, "turnover": 0.02330104453974091, "annualized_return": 0.043612060936118136, "sharpe_ratio": 0.3412786988534191, "max_drawdown": -0.7656135112088509, "excess_return": 0.5429099722537647, "information_ratio": 1.1833750724174616}
+--- Alpha 15 ---
+Name: volume_confirmed_growth_score
+Q-Value: 4.5120
+In Library: No
+Formula: ts_rank(sma((ts_rank(ts_delta(vwap, 20), 20) * ts_rank(volume, 20)), 5), 10)
+Scores: {"Effectiveness": 0.92, "Stability": 0.64, "Turnover": 5.0, "Diversity": 8.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.009158105414814141, "rank_ic_std": 0.14200583621204094, "icir": 0.06449104951672126, "turnover": 0.5, "annualized_return": 0.03151592877027287, "sharpe_ratio": 0.3205469002460528, "max_drawdown": -0.48176829874635857, "excess_return": 0.2668357687709886, "information_ratio": 0.840576990492404}
+==================== RUN END ====================
+

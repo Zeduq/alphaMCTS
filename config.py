@@ -1,49 +1,163 @@
-import os
+"""
+AlphaMCTS 全局配置
 
-# --- 动态配置读取 ---
-# 默认为 'gpt-4o'，如果环境变量里有设置（由 run_experiment.py 传入），则使用环境变量
+使用方法:
+1. 复制 .env.example 为 .env
+2. 填入你的 API Key
+3. 其他配置项可选
+"""
+
+import os
+from pathlib import Path
+from typing import List
+
+
+def load_dotenv_builtin(env_path: Path):
+    """
+    内置的 .env 文件解析器（不依赖 python-dotenv）
+    """
+    if not env_path.exists():
+        return
+    
+    try:
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                # 跳过空行和注释
+                if not line or line.startswith('#'):
+                    continue
+                # 解析 KEY=VALUE
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    # 移除可能的引号
+                    if (value.startswith('"') and value.endswith('"')) or \
+                       (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    # 设置环境变量
+                    if key:
+                        os.environ[key] = value
+    except Exception as e:
+        print(f"[Config] 警告: 读取 .env 文件失败: {e}")
+
+
+# 加载 .env 文件
+env_path = Path(__file__).parent / '.env'
+load_dotenv_builtin(env_path)
+
+# 尝试使用 python-dotenv（如果已安装）
+try:
+    from dotenv import load_dotenv
+    if env_path.exists():
+        load_dotenv(env_path)
+except ImportError:
+    pass  # 使用内置解析器即可
+
+
+# ==================== 动态配置读取 ====================
+
+# 默认为 'qwen3-max'，如果环境变量里有设置，则使用环境变量
 CURRENT_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE", "qwen3-max")
-# 默认为 'prompts' (英文)，如果有设置则用设置值 (如 'prompts_cn')
+
+# 默认为 'prompts_cn'，如果有设置则用设置值
 PROMPT_DIR = os.getenv("PROMPT_DIR", "prompts_cn")
 
-print(f"--- [Config] 当前模型模式: {CURRENT_MODEL_TYPE} | 提示词目录: {PROMPT_DIR} ---")
+# 数据目录
+DATA_DIR = os.getenv("DATA_DIR", "D:/AAProject/Data")
 
-# --- 模型与 API 配置 ---
-if CURRENT_MODEL_TYPE == "qwen3-max":
-    # [Group C & D 配置]
-    # 请在此处填入你的 阿里云 DashScope API Key
-    OPENAI_API_KEY = "sk-68e101b794484ae2a1567a066ac8e133"
-    # 阿里云兼容 OpenAI 格式的 Base URL
-    BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    LLM_MODEL = "qwen3-max"  # 或者 "qwen-plus"，根据你购买的模型填写
 
-else:
-    # [Group A & B 配置] (默认)
-    # 请在此处填入你的 OpenAI / 中转 API Key
-    OPENAI_API_KEY = "sk-fad0tLlqZp0HyxWT6c6cDa8dD9754c71A8329dEa51D1C2Ec"
-    BASE_URL = "https://openai.wokaai.cn/v1/"
-    LLM_MODEL = "gpt-4o"
+def print_config():
+    """打印当前配置信息（可选调用）"""
+    print(f"--- [Config] 当前模型模式: {CURRENT_MODEL_TYPE} | 提示词目录: {PROMPT_DIR} ---")
+    print(f"--- [Config] 搜索预算: {INITIAL_SEARCH_BUDGET} | 准入阈值: {EFFECTIVENESS_THRESHOLD} ---")
 
-# --- 其他参数 ---
-LLM_TEMPERATURE = 1.0
-SHOW_DEBATE_LOG = False  # 建议开启，方便在日志中观察中文/英文辩论的区别
 
-# MCTS 参数
-INITIAL_SEARCH_BUDGET = 10
-BUDGET_INCREMENT = 1
-MCTS_EXPLORATION_WEIGHT = 1.414
+# ==================== 模型与 API 配置 ====================
 
-# 评测维度
-EFFECTIVENESS_THRESHOLD = 2
-EVALUATION_DIMENSIONS = [
+def get_api_config():
+    """
+    获取API配置
+    
+    Returns:
+        dict: 包含 api_key, base_url, model 的字典
+    """
+    if CURRENT_MODEL_TYPE == "qwen3-max":
+        api_key = os.getenv("DASHSCOPE_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "未设置 DASHSCOPE_API_KEY 环境变量。\n"
+                "请在 .env 文件中设置: DASHSCOPE_API_KEY=your-api-key"
+            )
+        return {
+            "api_key": api_key,
+            "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+            "model": "qwen3-max"
+        }
+    else:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "未设置 OPENAI_API_KEY 环境变量。\n"
+                "请在 .env 文件中设置: OPENAI_API_KEY=your-api-key"
+            )
+        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        return {
+            "api_key": api_key,
+            "base_url": base_url,
+            "model": CURRENT_MODEL_TYPE
+        }
+
+
+# 向后兼容：尝试加载配置，失败时使用占位值
+try:
+    api_config = get_api_config()
+    OPENAI_API_KEY = api_config["api_key"]
+    BASE_URL = api_config["base_url"]
+    LLM_MODEL = api_config["model"]
+except ValueError as e:
+    # 未设置 API Key，使用占位值
+    OPENAI_API_KEY = ""
+    BASE_URL = ""
+    LLM_MODEL = CURRENT_MODEL_TYPE
+    print(f"[Config] 警告: {e}")
+
+
+# ==================== 其他参数 ====================
+
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "1.0"))
+SHOW_DEBATE_LOG = os.getenv("SHOW_DEBATE_LOG", "False").lower() == "true"
+
+
+# ==================== MCTS 参数 ====================
+
+INITIAL_SEARCH_BUDGET = int(os.getenv("INITIAL_SEARCH_BUDGET", "10"))
+BUDGET_INCREMENT = int(os.getenv("BUDGET_INCREMENT", "1"))
+MCTS_EXPLORATION_WEIGHT = float(os.getenv("MCTS_EXPLORATION_WEIGHT", "1.414"))
+
+# 辩论轮数
+DEBATE_ROUNDS = int(os.getenv("DEBATE_ROUNDS", "2"))
+
+
+# ==================== 评测维度参数 ====================
+
+EFFECTIVENESS_THRESHOLD = float(os.getenv("EFFECTIVENESS_THRESHOLD", "2.0"))
+
+EVALUATION_DIMENSIONS: List[str] = [
     "Effectiveness", "Stability", "Turnover", "Diversity", "Overfitting Risk"
 ]
-EVAL_TEMP = 1.0
+EVAL_TEMP = float(os.getenv("EVAL_TEMP", "1.0"))
 MAX_EVAL_SCORE_PER_DIM = 10.0
 
-# 字段与算子 (保持不变)
-AVAILABLE_DATA_FIELDS = ["open", "high", "low", "close", "volume", "vwap"]
-AVAILABLE_OPERATORS = [
+# 入库Q值阈值
+ELITE_Q_THRESHOLD = 5.0
+
+
+# ==================== 数据字段与算子定义 ====================
+
+AVAILABLE_DATA_FIELDS: List[str] = ["open", "high", "low", "close", "volume", "vwap"]
+
+AVAILABLE_OPERATORS: List[str] = [
     "ts_mean", "ts_std", "ts_rank", "ts_corr", "ts_delta",
     "rank", "scale", "log", "abs", "sign",
     "add", "subtract", "multiply", "divide",
@@ -52,6 +166,7 @@ AVAILABLE_OPERATORS = [
     "ts_argmin", "decay_linear"
 ]
 
+# 算子参数数量映射
 OPERATOR_PARAM_COUNT = {
     "add": 0, "subtract": 0, "multiply": 0, "divide": 0,
     "log": 0, "abs": 0, "sign": 0, "rank": 0, "scale": 0,
@@ -61,6 +176,7 @@ OPERATOR_PARAM_COUNT = {
     "ts_argmax": 1, "ts_argmin": 1, "decay_linear": 1
 }
 
+# 算子输入数量映射
 OPERATOR_INPUT_COUNT = {
     "add": 2, "subtract": 2, "multiply": 2, "divide": 2,
     "ts_mean": 1, "ts_std": 1, "ts_rank": 1, "ts_delta": 1,
@@ -70,3 +186,19 @@ OPERATOR_INPUT_COUNT = {
     "log": 1, "abs": 1, "sign": 1, "rank": 1, "scale": 1,
     "ts_corr": 2, "correlation": 2, "covariance": 2
 }
+
+
+# ==================== 日期配置（实验2） ====================
+
+# 训练期（用于因子挖掘）
+TRAIN_BEGIN = "2017-01-03"
+TRAIN_END = "2022-06-26"
+
+# 测试期（仅用于回测验证）
+TEST_BEGIN = "2022-06-27"
+TEST_END = "2023-06-26"
+
+
+if __name__ == "__main__":
+    print_config()
+    print(f"\nAPI配置: model={LLM_MODEL}, base_url={BASE_URL[:30]}...")

@@ -1,0 +1,1749 @@
+[
+    {
+        "Rank": 1,
+        "Mode": "refiner",
+        "Name": "robust_volume_weighted_trend",
+        "Description": "通过成交量加权价格趋势，并结合价格波动稳定性进行调整，利用标准化和无量纲化提升因子在不同市场状态下的预测有效性；引入价格动量与成交量变化的相关性以增强信号强度。",
+        "Formula_Steps": [
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "price_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "price_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "v1"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v4",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "v5"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v7",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "momentum_lag"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "v9",
+                    "volume"
+                ],
+                "param": [
+                    "corr_window"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v8",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v11"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v11"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 5,
+        "Q_Value": 6.2
+    },
+    {
+        "Rank": 2,
+        "Mode": "refiner",
+        "Name": "stabilized_volume_weighted_price_trend",
+        "Description": "通过引入价格变动与成交量变化的相关性，并结合波动率标准化，构建一个对市场状态更稳健的无量纲趋势因子；使用滚动窗口内价格动量经成交量加权后，再除以其历史标准差以实现稳定性增强。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "price_lookback"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v1",
+                    "volume"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_sum",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "trend_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "trend_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "corr_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v7"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.018
+    },
+    {
+        "Rank": 3,
+        "Mode": "refiner",
+        "Name": "stable_volume_price_divergence",
+        "Description": "通过多窗口标准化处理价格动量与成交量变化之间的背离，提升因子在不同市场状态下的稳定性。高值表示价格上涨但成交量萎缩（潜在反转），低值表示价格下跌但成交量放大（趋势强化）。所有计算均无量纲，并引入多尺度窗口以增强鲁棒性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "price_mom"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "vol_ma_short"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "vol_ma_long"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "vol_ma_short",
+                    "vol_ma_long"
+                ],
+                "param": [],
+                "output": "vol_trend"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "price_mom"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "price_std"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "price_mom",
+                    "price_std"
+                ],
+                "param": [],
+                "output": "norm_price_mom"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "vol_trend"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "vol_std"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "vol_trend",
+                    "vol_std"
+                ],
+                "param": [],
+                "output": "norm_vol_trend"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "norm_price_mom",
+                    "norm_vol_trend"
+                ],
+                "param": [],
+                "output": "raw_alpha"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "raw_alpha"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "raw_alpha"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "raw_alpha",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v4"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 5,
+        "Q_Value": 6.256
+    },
+    {
+        "Rank": 4,
+        "Mode": "refiner",
+        "Name": "multi_window_volume_price_divergence",
+        "Description": "通过多时间窗口标准化价格变动与成交量变动的负相关性，捕捉价量背离信号。高值表示价格上涨但成交量萎缩（潜在反转），低值表示价格下跌但成交量放大（趋势强化）。所有计算无量纲，并融合短期、中期、长期三个尺度以提升因子在不同市场状态下的有效性与鲁棒性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "div_short"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v8"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v9"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v8",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v12"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v9",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v12",
+                    "v13"
+                ],
+                "param": [],
+                "output": "v14"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v14"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "div_mid"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v15"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v16"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v15"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v17"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v16"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v18"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v15",
+                    "v17"
+                ],
+                "param": [],
+                "output": "v19"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v16",
+                    "v18"
+                ],
+                "param": [],
+                "output": "v20"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v19",
+                    "v20"
+                ],
+                "param": [],
+                "output": "v21"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v21"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "div_long"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "div_short",
+                    "div_mid"
+                ],
+                "param": [],
+                "output": "v22"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v22",
+                    "div_long"
+                ],
+                "param": [],
+                "output": "raw_alpha"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "raw_alpha"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 3,
+        "Q_Value": 6.256
+    },
+    {
+        "Rank": 5,
+        "Mode": "refiner",
+        "Name": "robust_multi_horizon_volume_price_divergence",
+        "Description": "通过多时间窗口标准化价格变动与成交量变动的负相关性，捕捉价量背离信号。高值表示价格上涨但成交量萎缩（潜在反转），低值表示价格下跌但成交量放大（趋势强化）。为提升稳定性，对各窗口结果进行波动率加权融合，并确保所有中间变量无量纲。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v9"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "mid_window"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v9"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v10"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v12"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v9",
+                    "v11"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v10",
+                    "v12"
+                ],
+                "param": [],
+                "output": "v14"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v13",
+                    "v14"
+                ],
+                "param": [],
+                "output": "v15"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v15"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v16"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v17"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v18"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v17"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v19"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v18"
+                ],
+                "param": [
+                    "norm_window"
+                ],
+                "output": "v20"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v17",
+                    "v19"
+                ],
+                "param": [],
+                "output": "v21"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v18",
+                    "v20"
+                ],
+                "param": [],
+                "output": "v22"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v21",
+                    "v22"
+                ],
+                "param": [],
+                "output": "v23"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v23"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v24"
+            },
+            {
+                "name": "stddev",
+                "input": [
+                    "v8"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v25"
+            },
+            {
+                "name": "stddev",
+                "input": [
+                    "v16"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v26"
+            },
+            {
+                "name": "stddev",
+                "input": [
+                    "v24"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v27"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v25",
+                    "v26"
+                ],
+                "param": [],
+                "output": "v28"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v28",
+                    "v27"
+                ],
+                "param": [],
+                "output": "v29"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v25",
+                    "v29"
+                ],
+                "param": [],
+                "output": "w1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v26",
+                    "v29"
+                ],
+                "param": [],
+                "output": "w2"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v27",
+                    "v29"
+                ],
+                "param": [],
+                "output": "w3"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v8",
+                    "w1"
+                ],
+                "param": [],
+                "output": "v30"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v16",
+                    "w2"
+                ],
+                "param": [],
+                "output": "v31"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v24",
+                    "w3"
+                ],
+                "param": [],
+                "output": "v32"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v30",
+                    "v31"
+                ],
+                "param": [],
+                "output": "v33"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v33",
+                    "v32"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 6.256
+    },
+    {
+        "Rank": 6,
+        "Mode": "refiner",
+        "Name": "stabilized_volume_price_correlation",
+        "Description": "通过标准化价格与成交量的时序相关性，并引入波动率调整和衰减加权，提升因子在不同市场环境下的稳定性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "price_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "price_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "v1"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v2"
+                ],
+                "param": [],
+                "output": "norm_close"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "vol_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "volume",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v5"
+                ],
+                "param": [],
+                "output": "norm_volume"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "norm_close",
+                    "norm_volume"
+                ],
+                "param": [
+                    "corr_window"
+                ],
+                "output": "raw_corr"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "raw_corr"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "decayed_corr"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "decayed_corr"
+                ],
+                "param": [
+                    "std_window"
+                ],
+                "output": "corr_vol"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "decayed_corr",
+                    "corr_vol"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 6,
+        "Q_Value": 6.594
+    },
+    {
+        "Rank": 7,
+        "Mode": "refiner",
+        "Name": "stabilized_volume_price_correlation",
+        "Description": "通过标准化价格与成交量的时序相关性，并引入波动率调整和线性衰减权重，提升因子在不同市场环境下的稳定性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "v1"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v2"
+                ],
+                "param": [],
+                "output": "norm_close"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "volume",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v5"
+                ],
+                "param": [],
+                "output": "norm_volume"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "norm_close",
+                    "norm_volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "raw_corr"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "raw_corr"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "decayed_corr"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "decayed_corr"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "corr_std"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "decayed_corr",
+                    "corr_std"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 4,
+        "Q_Value": 6.294
+    },
+    {
+        "Rank": 8,
+        "Mode": "refiner",
+        "Name": "stable_volume_price_correlation",
+        "Description": "通过计算价格与成交量在多个标准化时间窗口内的相关性，并引入波动率加权和线性衰减机制，提升因子在不同市场环境下的稳定性与无量纲特性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "window_short"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "window_short"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "v1"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v2"
+                ],
+                "param": [],
+                "output": "norm_close"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "window_short"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "window_short"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "volume",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v5"
+                ],
+                "param": [],
+                "output": "norm_volume"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "norm_close",
+                    "norm_volume"
+                ],
+                "param": [
+                    "window_short"
+                ],
+                "output": "corr_short"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "window_long"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "window_long"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v9",
+                    "v8"
+                ],
+                "param": [],
+                "output": "norm_close_long"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "window_long"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "window_long"
+                ],
+                "output": "v11"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "volume",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v12"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v12",
+                    "v11"
+                ],
+                "param": [],
+                "output": "norm_volume_long"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "norm_close_long",
+                    "norm_volume_long"
+                ],
+                "param": [
+                    "window_long"
+                ],
+                "output": "corr_long"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "corr_short"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "decayed_corr_short"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "corr_long"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "decayed_corr_long"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "decayed_corr_short",
+                    "decayed_corr_long"
+                ],
+                "param": [],
+                "output": "combined_corr"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "window_vol"
+                ],
+                "output": "price_volatility"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "combined_corr",
+                    "price_volatility"
+                ],
+                "param": [],
+                "output": "v13"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v13"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 3,
+        "Q_Value": 7.11
+    },
+    {
+        "Rank": 9,
+        "Mode": "refiner",
+        "Name": "decay_weighted_volume_price_stability",
+        "Description": "通过在多个标准化时间窗口内计算价格与成交量的相关性，引入波动率加权和线性衰减机制，提升因子在不同市场环境下的稳定性与无量纲特性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v3"
+                ],
+                "param": [],
+                "output": "weight_short"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v3"
+                ],
+                "param": [],
+                "output": "weight_long"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "corr_short"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "long_prot_window"
+                ],
+                "output": "corr_long"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "corr_short",
+                    "weight_short"
+                ],
+                "param": [],
+                "output": "weighted_corr_short"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "corr_long",
+                    "weight_long"
+                ],
+                "param": [],
+                "output": "weighted_corr_long"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "weighted_corr_short",
+                    "weighted_corr_long"
+                ],
+                "param": [],
+                "output": "combined_corr"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "combined_corr"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "decayed_corr"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "decayed_corr"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v4"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 7.11
+    },
+    {
+        "Rank": 10,
+        "Mode": "refiner",
+        "Name": "stability_enhanced_volume_price_corr",
+        "Description": "通过在多个标准化时间窗口内计算价格与成交量的相关性，并结合波动率倒数加权及线性衰减机制，提升因子在不同市场环境下的稳定性与无量纲特性。",
+        "Formula_Steps": [
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "v1",
+                    "v2"
+                ],
+                "param": [],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v3"
+                ],
+                "param": [],
+                "output": "vol_weight_short"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v3"
+                ],
+                "param": [],
+                "output": "vol_weight_long"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "short_window"
+                ],
+                "output": "corr_short"
+            },
+            {
+                "name": "ts_corr",
+                "input": [
+                    "close",
+                    "volume"
+                ],
+                "param": [
+                    "long_window"
+                ],
+                "output": "corr_long"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "corr_short",
+                    "vol_weight_short"
+                ],
+                "param": [],
+                "output": "weighted_corr_short"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "corr_long",
+                    "vol_weight_long"
+                ],
+                "param": [],
+                "output": "weighted_corr_long"
+            },
+            {
+                "name": "add",
+                "input": [
+                    "weighted_corr_short",
+                    "weighted_corr_long"
+                ],
+                "param": [],
+                "output": "combined_corr"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "combined_corr"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "decayed_signal"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "decayed_signal"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v4"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 7.11
+    }
+]

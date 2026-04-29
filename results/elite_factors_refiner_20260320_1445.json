@@ -1,0 +1,542 @@
+[
+    {
+        "Rank": 1,
+        "Mode": "refiner",
+        "Name": "stable_volume_weighted_price_trend",
+        "Description": "通过体积加权平均价格（VWAP）与收盘价的相对变化衡量趋势，并用价格波动率进行标准化，以提升因子在不同市场波动环境下的稳定性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "close",
+                    "vwap"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v1"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v2",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v4",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v8"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 15,
+        "Q_Value": 6.486
+    },
+    {
+        "Rank": 2,
+        "Mode": "refiner",
+        "Name": "stability_enhanced_vwap_trend",
+        "Description": "通过计算 VWAP 与收盘价相对偏差的时序稳定性，并利用价格波动率进行标准化，以提升因子在不同市场环境下的稳健性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "close"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "abs",
+                "input": [
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v6"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 5,
+        "Q_Value": 6.486
+    },
+    {
+        "Rank": 3,
+        "Mode": "refiner",
+        "Name": "stability_adjusted_vwap_deviation",
+        "Description": "通过计算VWAP与收盘价相对偏差的时间序列稳定性，并利用价格波动率进行标准化，提升因子在不同市场环境下的稳健性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "close"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "stability_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "stability_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "volatility_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "volatility_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v8"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.418
+    },
+    {
+        "Rank": 4,
+        "Mode": "refiner",
+        "Name": "stability_enhanced_vwap_deviation",
+        "Description": "通过计算VWAP与收盘价相对偏差的时间序列稳定性，并结合价格波动率进行双重标准化，提升因子在不同市场环境下的稳健性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "close"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "stability_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "stability_window"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v3",
+                    "v4"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "abs",
+                "input": [
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "volatility_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v7"
+                ],
+                "param": [
+                    "volatility_window"
+                ],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v9"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 1,
+        "Q_Value": 6.15
+    },
+    {
+        "Rank": 5,
+        "Mode": "refiner",
+        "Name": "stability_enhanced_vwap_trend",
+        "Description": "通过计算 VWAP 与收盘价相对偏离度的时序稳定性，并结合价格波动率进行标准化，提升因子在不同市场波动环境下的稳定性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "close"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "abs",
+                "input": [
+                    "v5"
+                ],
+                "param": [],
+                "output": "v6"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v6"
+                ],
+                "param": [],
+                "output": "v7"
+            }
+        ],
+        "Visits": 4,
+        "Q_Value": 6.486
+    },
+    {
+        "Rank": 6,
+        "Mode": "refiner",
+        "Name": "stability_adjusted_vwap_deviation",
+        "Description": "通过计算VWAP与收盘价相对偏离度的时间序列稳定性，并结合价格波动率进行标准化，以提升因子在不同市场波动环境下的预测稳健性和有效性。",
+        "Formula_Steps": [
+            {
+                "name": "subtract",
+                "input": [
+                    "vwap",
+                    "close"
+                ],
+                "param": [],
+                "output": "v1"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "close"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v4"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v4",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v5"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "lookback_period"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v6",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v5",
+                    "v8"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "scale",
+                "input": [
+                    "v9"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.42
+    }
+]

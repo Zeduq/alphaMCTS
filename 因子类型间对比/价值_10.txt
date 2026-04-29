@@ -1,0 +1,109 @@
+==================== RUN START: 2026-03-17 15:52:57 ====================
+Factor Type: 价值因子
+--- Alpha 1 ---
+Name: vwap_deviation_value_proxy
+Q-Value: 5.6440
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / ts_std(vwap, 20)) * (close / vwap)))
+Scores: {"Effectiveness": 0.35, "Stability": 0.23, "Turnover": 8.78, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 0.0035439073325109092, "rank_ic_std": 0.15333607477283173, "icir": 0.023112025906240445, "turnover": 0.1219345232303215, "annualized_return": 0.07119721248212163, "sharpe_ratio": 0.5537737053140696, "max_drawdown": -0.5272769121007661, "excess_return": 0.4763516217672188, "information_ratio": 1.1476370757549241}
+--- Alpha 2 ---
+Name: vwap_deviation_value_proxy_stable
+Q-Value: 5.0760
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / (ts_std(vwap, 20) + ts_mean(abs(ts_delta(vwap, 1)), 20))) * (close / vwap)))
+Scores: {"Effectiveness": 0.33, "Stability": 0.21, "Turnover": 8.84, "Diversity": 10.0, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 0.0032916932536549855, "rank_ic_std": 0.1549601846747942, "icir": 0.02124218721449686, "turnover": 0.1160739716310698, "annualized_return": 0.07365403966530959, "sharpe_ratio": 0.5667430509968848, "max_drawdown": -0.5208973408909885, "excess_return": 0.5082726018354515, "information_ratio": 1.1956139966477801}
+--- Alpha 3 ---
+Name: vwap_deviation_value_proxy_stable
+Q-Value: 4.9580
+In Library: No
+Formula: scale((((vwap - ts_mean(vwap, 30)) / (ts_std(vwap, 30) + ts_mean(abs(ts_delta(vwap, 1)), 30))) * ts_mean((close / vwap), 5)))
+Scores: {"Effectiveness": 0.0, "Stability": 0.0, "Turnover": 9.17, "Diversity": 9.62, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": 2.189684042019956e-05, "rank_ic_std": 0.16060705842794712, "icir": 0.0001363379706628716, "turnover": 0.08258907196364085, "annualized_return": 0.08033010364832793, "sharpe_ratio": 0.5915390147692592, "max_drawdown": -0.7032278684116756, "excess_return": 0.49725567501652557, "information_ratio": 1.1489651588365273}
+--- Alpha 4 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 3.8800
+In Library: No
+Formula: rank((ts_rank((close / vwap), 20) - ts_rank(close, 5)))
+Scores: {"Effectiveness": 1.82, "Stability": 1.37, "Turnover": 0.29, "Diversity": 9.92, "Overfitting Risk": 6.0}
+Financial Metrics: {"rank_ic_mean": -0.018177477610251194, "rank_ic_std": 0.13252205155720037, "icir": -0.13716568221406733, "turnover": 0.9714420443828337, "annualized_return": -0.11825864348435788, "sharpe_ratio": -0.9295461747968804, "max_drawdown": -0.9801601851927224, "excess_return": -0.45213211977383405, "information_ratio": -1.5421247875538175}
+--- Alpha 5 ---
+Name: vwap_deviation_value_proxy_stable
+Q-Value: 4.6680
+In Library: No
+Formula: rank(((((vwap - ts_mean(vwap, 30)) / (ts_std(vwap, 30) + ts_mean(abs(ts_delta(vwap, 1)), 30))) * decay_linear((close / vwap), 10)) * ts_corr(close, vwap, 20)))
+Scores: {"Effectiveness": 0.1, "Stability": 0.06, "Turnover": 9.18, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": -0.001022642081869397, "rank_ic_std": 0.16229024915842888, "icir": -0.006301315619221748, "turnover": 0.08230286081950644, "annualized_return": 0.07608050356524476, "sharpe_ratio": 0.5608442709725469, "max_drawdown": -0.6999400051841498, "excess_return": 0.4722491173792762, "information_ratio": 1.10865720281114}
+--- Alpha 6 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 4.9980
+In Library: No
+Formula: rank((decay_linear(((vwap - ts_mean(vwap, 20)) / ts_std(vwap, 20)), 10) * (close / vwap)))
+Scores: {"Effectiveness": 0.14, "Stability": 0.09, "Turnover": 9.66, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": -0.0013863655589830283, "rank_ic_std": 0.15720613251877283, "icir": -0.008818775303294705, "turnover": 0.03377048632535595, "annualized_return": 0.06509001404950743, "sharpe_ratio": 0.5042896504423241, "max_drawdown": -0.6705726835034538, "excess_return": 0.6117862127945506, "information_ratio": 1.3402725433595075}
+--- Alpha 7 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 4.9980
+In Library: No
+Formula: rank((decay_linear(((vwap - ts_mean(vwap, 20)) / decay_linear(ts_std(vwap, 20), 10)), 10) * decay_linear((close / vwap), 10)))
+Scores: {"Effectiveness": 0.19, "Stability": 0.12, "Turnover": 9.68, "Diversity": 10.0, "Overfitting Risk": 5.0}
+Financial Metrics: {"rank_ic_mean": -0.0019416117609918156, "rank_ic_std": 0.1583981863650391, "icir": -0.012257790354475667, "turnover": 0.031820328071040294, "annualized_return": 0.06908258749530205, "sharpe_ratio": 0.5251020412657638, "max_drawdown": -0.638623712545079, "excess_return": 0.5486532100613286, "information_ratio": 1.2298925889882477}
+--- Alpha 8 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 4.4280
+In Library: No
+Formula: rank((decay_linear(((vwap - ts_mean(vwap, 20)) / decay_linear(ts_std(vwap, 20), 10)), 10) * (ts_rank((close / vwap), 10) * sign(((vwap - ts_mean(vwap, 20)) / decay_linear(ts_std(vwap, 20), 10))))))
+Scores: {"Effectiveness": 1.09, "Stability": 0.89, "Turnover": 6.16, "Diversity": 10.0, "Overfitting Risk": 4.0}
+Financial Metrics: {"rank_ic_mean": -0.010854787877243081, "rank_ic_std": 0.12226792702271447, "icir": -0.08877870216304984, "turnover": 0.3841272622377715, "annualized_return": -0.05608354576220376, "sharpe_ratio": -0.44019280206573186, "max_drawdown": -0.9167597758658854, "excess_return": -0.282087060828244, "information_ratio": -0.8422078511326369}
+--- Alpha 9 ---
+Name: vwap_deviation_value_proxy_stable
+Q-Value: 4.8460
+In Library: No
+Formula: scale((((vwap - decay_linear(vwap, 30)) / (ts_std(vwap, 30) + decay_linear(abs(ts_delta(vwap, 1)), 30))) * decay_linear((close / vwap), 10)))
+Scores: {"Effectiveness": 0.23, "Stability": 0.15, "Turnover": 8.85, "Diversity": 10.0, "Overfitting Risk": 5.0}
+Financial Metrics: {"rank_ic_mean": 0.0023494324297811823, "rank_ic_std": 0.1578315624656951, "icir": 0.01488569455359624, "turnover": 0.11549609186498255, "annualized_return": 0.07504866156824797, "sharpe_ratio": 0.5671589928395807, "max_drawdown": -0.6028437267417457, "excess_return": 0.47027130174031817, "information_ratio": 1.1199381438248461}
+--- Alpha 10 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 5.6440
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / ts_std(vwap, 20)) * ts_mean((close / vwap), 20)))
+Scores: {"Effectiveness": 0.35, "Stability": 0.23, "Turnover": 8.78, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.0035143748146361934, "rank_ic_std": 0.15339986199044955, "icir": 0.02290989554381081, "turnover": 0.12196219265512087, "annualized_return": 0.06979264516445682, "sharpe_ratio": 0.5444398546369333, "max_drawdown": -0.5332366840786219, "excess_return": 0.4548415081034831, "information_ratio": 1.1127952648238362}
+--- Alpha 11 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 5.4780
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / ts_mean(abs(ts_delta(vwap, 1)), 20)) * decay_linear((close / vwap), 20)))
+Scores: {"Effectiveness": 0.26, "Stability": 0.17, "Turnover": 8.96, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.002628469408076791, "rank_ic_std": 0.1584384832569898, "icir": 0.016589842026027042, "turnover": 0.10445185119557343, "annualized_return": 0.07756145925802072, "sharpe_ratio": 0.581044418254518, "max_drawdown": -0.4878487469548321, "excess_return": 0.596487372677537, "information_ratio": 1.3171657699773458}
+--- Alpha 12 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 4.1020
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 30)) / ts_mean(abs(ts_delta(vwap, 1)), 30)) * decay_linear(((close / vwap) - delay((close / vwap), 1)), 10)))
+Scores: {"Effectiveness": 1.37, "Stability": 1.14, "Turnover": 0.0, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.013713283392570472, "rank_ic_std": 0.12004624182974633, "icir": -0.11423334194850614, "turnover": 1.0, "annualized_return": -0.09359135561921594, "sharpe_ratio": -0.799888559749651, "max_drawdown": -0.9501374473323764, "excess_return": -0.3981057469651287, "information_ratio": -1.319516251380915}
+--- Alpha 13 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 5.6440
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / ts_std(vwap, 20)) * (ts_mean((close / vwap), 20) * ts_mean(((high - vwap) / (high - low)), 10))))
+Scores: {"Effectiveness": 0.87, "Stability": 0.58, "Turnover": 8.77, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.008735162713288792, "rank_ic_std": 0.14965967137036515, "icir": 0.05836684414247942, "turnover": 0.12317867726466147, "annualized_return": 0.09737019940961589, "sharpe_ratio": 0.7501069385513283, "max_drawdown": -0.43423453224367004, "excess_return": 0.7250874731983763, "information_ratio": 1.549088614109806}
+--- Alpha 14 ---
+Name: vwap_deviation_value_proxy_optimized
+Q-Value: 5.4600
+In Library: No
+Formula: rank((((vwap - ts_mean(vwap, 20)) / ts_std(vwap, 20)) * (ts_mean((close / vwap), 20) * ts_mean(((ts_max(close, 10) - close) / (ts_max(close, 10) - ts_min(close, 10))), 10))))
+Scores: {"Effectiveness": 0.38, "Stability": 0.25, "Turnover": 8.67, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.003808204869958106, "rank_ic_std": 0.1498144587741726, "icir": 0.025419474869902377, "turnover": 0.1327179936343592, "annualized_return": 0.05628005392163016, "sharpe_ratio": 0.46501644917721346, "max_drawdown": -0.5484287206782067, "excess_return": 0.3057852799176337, "information_ratio": 0.8603868203469291}
+--- Alpha 15 ---
+Name: robust_vwap_value_momentum
+Q-Value: 4.9240
+In Library: No
+Formula: rank((ts_rank((close - vwap), 20) + (ts_delta((close - vwap), 1) / ts_std((close - vwap), 20))))
+Scores: {"Effectiveness": 0.16, "Stability": 0.09, "Turnover": 7.37, "Diversity": 10.0, "Overfitting Risk": 7.0}
+Financial Metrics: {"rank_ic_mean": -0.0015649749269501644, "rank_ic_std": 0.17496613269234215, "icir": -0.008944444864092602, "turnover": 0.2627509233067513, "annualized_return": 0.05372491980351546, "sharpe_ratio": 0.4029062513641051, "max_drawdown": -0.6829423214423358, "excess_return": 0.4006356443671133, "information_ratio": 0.9662658535960322}
+==================== RUN END ====================
+

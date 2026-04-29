@@ -1,0 +1,124 @@
+[
+    {
+        "Rank": 1,
+        "Mode": "refiner",
+        "Name": "volume_weighted_decay_momentum",
+        "Description": "结合线性衰减加权的近期价格动量，并以标准化成交量作为权重，提升因子在不同市场波动环境下的稳定性和预测能力；所有计算均无量纲且窗口参数化。",
+        "Formula_Steps": [
+            {
+                "name": "ts_delta",
+                "input": [
+                    "close"
+                ],
+                "param": [
+                    "momentum_window"
+                ],
+                "output": "v1"
+            },
+            {
+                "name": "abs",
+                "input": [
+                    "v1"
+                ],
+                "param": [],
+                "output": "v2"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v2"
+                ],
+                "param": [
+                    "normalization_window"
+                ],
+                "output": "v3"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v1",
+                    "v3"
+                ],
+                "param": [],
+                "output": "v4"
+            },
+            {
+                "name": "decay_linear",
+                "input": [
+                    "v4"
+                ],
+                "param": [
+                    "decay_window"
+                ],
+                "output": "v5"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "volume_window"
+                ],
+                "output": "v6"
+            },
+            {
+                "name": "ts_std",
+                "input": [
+                    "volume"
+                ],
+                "param": [
+                    "volume_window"
+                ],
+                "output": "v7"
+            },
+            {
+                "name": "subtract",
+                "input": [
+                    "volume",
+                    "v6"
+                ],
+                "param": [],
+                "output": "v8"
+            },
+            {
+                "name": "divide",
+                "input": [
+                    "v8",
+                    "v7"
+                ],
+                "param": [],
+                "output": "v9"
+            },
+            {
+                "name": "ts_mean",
+                "input": [
+                    "v9"
+                ],
+                "param": [
+                    "smooth_window"
+                ],
+                "output": "v10"
+            },
+            {
+                "name": "multiply",
+                "input": [
+                    "v5",
+                    "v10"
+                ],
+                "param": [],
+                "output": "v11"
+            },
+            {
+                "name": "rank",
+                "input": [
+                    "v11"
+                ],
+                "param": [],
+                "output": "alpha"
+            }
+        ],
+        "Visits": 2,
+        "Q_Value": 6.272
+    }
+]

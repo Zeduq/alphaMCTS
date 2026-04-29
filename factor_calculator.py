@@ -264,9 +264,12 @@ class FormulaParser:
 # --- 因子计算器封装类 ---
 class FactorCalculator:
     def __init__(self, data_path: str = 'D:/AAProject/Data/000300SH.csv',
-                 begin_date: str = '2017-01-01', end_date: str = '2023-06-26'):
+                 begin_date: str = '2017-01-01', end_date: str = '2023-06-26',
+                 holding_period: int = 5):
         print("--- [FactorCalculator] 初始化因子计算器 ---")
         print(f"--- [FactorCalculator] 正在从 {data_path} 加载数据... ---")
+        print(f"--- [FactorCalculator] 数据区间: {begin_date} 至 {end_date} ---")
+        print(f"--- [FactorCalculator] 持仓周期: {holding_period}日 ---")
         try:
             # 读取数据
             raw_data = pd.read_csv(data_path, parse_dates=['date'], dtype={'code': str}).iloc[:, 1:]
@@ -285,7 +288,7 @@ class FactorCalculator:
             self.assets = stock_data['close'].columns
             self.prices = stock_data['close']
 
-            self.holding_period = 5
+            self.holding_period = holding_period
             self.parser = FormulaParser(funcs=DEFAULT_FUNCS, schema_vars=self.schema_vars)
             print("--- [FactorCalculator] 因子计算器初始化完成 ---")
 

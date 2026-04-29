@@ -1,0 +1,2 @@
+﻿Rank,Mode,Name,Rank_IC,ICIR,Turnover,Effectiveness,Stability,Turnover_Score,Diversity,Overfitting_Risk,Q_Value
+1,refiner,volume_weighted_decay_momentum,-0.0207,-0.1581,0.0287,2.07,1.58,9.71,10.0,8.0,6.272

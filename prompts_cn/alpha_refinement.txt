@@ -2,48 +2,43 @@
 现有一个用于量化投资预测资产价格趋势的 Alpha 因子。
 请根据以下建议对其进行改进，并提供改进后的 Alpha 表达式。
 
-可用数据字段：
-
-以下数据字段可供使用：{available_fields}
-
-可用算子列表：
-
-以下算子可供使用：{available_operators}
+可用数据字段：{available_fields}
+可用算子列表：{available_operators}
 
 Alpha 建议：
-
 1. Alpha 值应当是无量纲的（unitless）。
-2. Alpha 计算中使用的所有回溯窗口和其他数值参数必须在伪代码中表示为命名参数。
-3. 这些参数名称必须遵循 Python 命名规范（例如：lookback_period, volatility_window, smoothing_factor）。
-4. Alpha 总共包含的参数数量不得超过 3 个。
-5. 伪代码应逐步表示 Alpha 的计算过程，仅使用“可用算子列表”中的算子和明确定义的参数。
-6. 伪代码中的每一行应代表一个单独的操作。
-7. 在伪代码中使用描述性的变量名，清晰地表明它们所代表的数据。
-8. 在设计 Alpha 表达式时，尽量避免包含以下子表达式：{freq_subtrees}
+2. Alpha 计算中使用的所有回溯窗口必须在 param 中表示。
+3. 伪代码应逐步表示 Alpha 的计算过程，仅使用“可用算子列表”中的算子。
+4. 尽量避免包含以下子表达式：{freq_subtrees}
 
-原始 Alpha 表达式：
+原始 Alpha 表达式画像：
 {origin_alpha_formula}
 
 改进建议：
-注意：以下改进建议不需要全部采纳；
-只需要考虑它们，并选择合理的建议进行采纳。
 {refinement_suggestions}
 
 格式要求：
-输出必须是包含三个键值对的 JSON 格式：
+输出必须是包含以下三个键的 Strict JSON 格式，绝对不要输出 markdown 代码块标记：
+* "name": 简短的描述性名称（如 price_volatility_ratio）。
+* "description": 对 Alpha 逻辑的简明解释。
+* "formula_steps": 一个字典列表，每个字典代表一个计算步骤，严格遵循格式：
+    {{
+      "name": "算子名称",
+      "input": ["输入变量1", "输入变量2"],
+      "param": ["参数1"],
+      "output": "v1"
+    }}
 
-* "name": 一个简短的、描述性的 Alpha 名称（遵循 Python 变量命名风格，例如：price_volatility_ratio）。
-* "description": 对 Alpha 用途或其衡量内容的简明解释。避免使用过于晦涩的技术术语。重点关注 Alpha 背后的直觉逻辑。
-* "pseudo_code": 一个字符串列表，其中每个字符串是表示 Alpha 计算中单个操作的简化伪代码。
-    每一行应遵循格式：variable_name = op_name(input=[input1, input2, ...], param=[param1, param2, ...])，其中：
-    * variable_name 是该操作的输出变量。
-    * op_name 是“可用算子列表”中的算子名称之一。
-    * input1, input2, ... 是输入变量（来自“可用数据字段”或之前计算出的变量，不能是数值类型）。
-    * param1, param2, ... 是“Alpha 因子要求”中定义的参数名称。
-
-格式示例如下：
+格式示例：
 {{
-"name": "volatility_adjusted_momentum",
-"description": "...",
-"pseudo_code": [......]
+  "name": "volatility_adjusted_momentum",
+  "description": "通过波动率调整的动量因子...",
+  "formula_steps": [
+    {{
+      "name": "ts_mean",
+      "input": ["close"],
+      "param": ["lookback_period"],
+      "output": "v1"
+    }}
+  ]
 }}

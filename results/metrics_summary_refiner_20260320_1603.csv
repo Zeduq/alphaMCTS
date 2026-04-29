@@ -1,0 +1,11 @@
+﻿Rank,Mode,Name,Rank_IC,ICIR,Turnover,Effectiveness,Stability,Turnover_Score,Diversity,Overfitting_Risk,Q_Value
+1,refiner,robust_volume_weighted_trend,-0.0183,-0.1412,0.0237,1.83,1.41,9.76,10.0,8.0,6.2
+2,refiner,stabilized_volume_weighted_price_trend,-0.0131,-0.0895,0.011,1.31,0.89,9.89,10.0,8.0,6.018
+3,refiner,stable_volume_price_divergence,-0.0209,-0.1394,0.0565,2.09,1.39,9.43,10.0,8.0,6.256
+4,refiner,multi_window_volume_price_divergence,-0.0228,-0.1686,0.081,2.28,1.69,9.19,10.0,8.0,6.256
+5,refiner,robust_multi_horizon_volume_price_divergence,-0.022,-0.1713,0.0632,2.2,1.71,9.37,10.0,8.0,6.256
+6,refiner,stabilized_volume_price_correlation,-0.0309,-0.195,0.007,3.09,1.95,9.93,10.0,8.0,6.594
+7,refiner,stabilized_volume_price_correlation,-0.0208,-0.142,0.0028,2.08,1.42,9.97,10.0,8.0,6.294
+8,refiner,stable_volume_price_correlation,-0.0215,-0.1209,0.0195,2.15,1.21,9.81,10.0,8.0,7.11
+9,refiner,decay_weighted_volume_price_stability,-0.0334,-0.1839,0.0012,3.34,1.84,9.99,10.0,8.0,7.11
+10,refiner,stability_enhanced_volume_price_corr,-0.0475,-0.2857,0.006,4.75,2.86,9.94,10.0,8.0,7.11

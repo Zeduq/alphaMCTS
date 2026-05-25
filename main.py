@@ -1,18 +1,19 @@
+import argparse
 import json
 import os
 import numpy as np
 import traceback
 from datetime import datetime
 from config import PROMPT_DIR
-from mcts.search import MCTS
-from utils.data_structures import AlphaNode, AlphaFormula
+from search.lifecycle import MCTS
+from search.tree import AlphaNode, AlphaFormula
 from utils.exporter import export_elite_factors
-from agents.portrait_agent import PortraitAgent
-from agents.formula_agent import FormulaAgent
+from inference.agents.portrait import PortraitAgent
+from inference.agents.formula import FormulaAgent
 from evaluation.evaluator import simulate_evaluation
 from config import INITIAL_SEARCH_BUDGET, BUDGET_INCREMENT, EFFECTIVENESS_THRESHOLD
-from alpha_library.library import AlphaLibrary
-from fsa.fsa_miner import mine_frequent_subtrees
+from constraint.library import AlphaLibrary
+from constraint.fsa import mine_frequent_subtrees
 
 
 # (initialize_root_node 函数保持不变)
@@ -43,14 +44,14 @@ def initialize_root_node(factor_type: str) -> AlphaNode:
     return root_node
 
 
-def run_search(factor_type: str):
-    """
-    运行MCTS搜索过程的主函数。
-    """
+def run_search(factor_type: str, budget: int = None, threshold: int = None):
+    search_budget = budget if budget is not None else INITIAL_SEARCH_BUDGET
+    effectiveness_threshold = threshold if threshold is not None else EFFECTIVENESS_THRESHOLD
+    
     all_generated_nodes_data = []
     try:
         root_node = initialize_root_node(factor_type)
-        is_root_effective = root_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD
+        is_root_effective = root_node.scores.get("Effectiveness", 0) >= effectiveness_threshold
         all_generated_nodes_data.append({
             "node": root_node, "in_library": is_root_effective
         })
@@ -68,7 +69,6 @@ def run_search(factor_type: str):
     if is_root_effective:
         effective_alpha_repository.add(root_node)
     max_score_overall = root_node.q_value
-    search_budget = INITIAL_SEARCH_BUDGET
     iteration_count = 0
     success_count = 0
     
@@ -83,7 +83,7 @@ def run_search(factor_type: str):
         if new_node:
             success_count += 1
             mcts.backpropagate(new_node)
-            is_new_node_effective = new_node.scores.get("Effectiveness", 0) >= EFFECTIVENESS_THRESHOLD
+            is_new_node_effective = new_node.scores.get("Effectiveness", 0) >= effectiveness_threshold
             all_generated_nodes_data.append({
                 "node": new_node, "in_library": is_new_node_effective
             })
@@ -135,7 +135,6 @@ def run_search(factor_type: str):
 
     print("\n所有生成因子的结果已追加到 result.txt 文件中。")
 
-    # 👉 [新增] 将所有满足 THRESHOLD 并入库的有效 Alpha (AlphaNode对象集合) 进行双轨导出
     if effective_alpha_repository.alphas:
         export_elite_factors(effective_alpha_repository.alphas, mode="main_run", save_dir="results")
 
@@ -164,7 +163,6 @@ def run_search(factor_type: str):
         print(formula_str)
         print(scores_str)
 
-        # <-- [新增] 格式化打印金融指标
         print("   金融指标:")
         print(f"     IC/IR (icir): {financial_metrics.get('icir', 0.0):.4f}")
         print(f"     年化收益率: {financial_metrics.get('annualized_return', 0.0):.4f}")
@@ -178,16 +176,31 @@ def run_search(factor_type: str):
 
 
 if __name__ == "__main__":
-    # (用户交互菜单部分保持不变)
+    parser = argparse.ArgumentParser(description="AlphaMCTS 命令行搜索")
+    parser.add_argument("-b", "--budget", type=int, default=None,
+                        help=f"初始搜索预算（默认: {INITIAL_SEARCH_BUDGET}）")
+    parser.add_argument("-t", "--threshold", type=int, default=None,
+                        help=f"准入阈值（默认: {EFFECTIVENESS_THRESHOLD}）")
+    parser.add_argument("--type", type=str, default=None,
+                        help="因子类型（动量/波动率/情绪/价值/质量/成长/不指定类型），不指定则交互式选择")
+    args = parser.parse_args()
+    
     factor_menu = {
         "1": "动量因子", "2": "波动率因子", "3": "情绪/另类因子",
         "4": "价值因子", "5": "质量因子",
         "6": "成长因子", "7": "不指定类型"
     }
-    print("请选择您想生成的初始Alpha因子类型:")
-    for key, value in factor_menu.items():
-        print(f"  {key}: {value}")
-    choice = input("请输入选项编号 (默认为7): ")
-    selected_type = factor_menu.get(choice, factor_menu["7"])
-    print(f"\n好的, 已选择生成: {selected_type}\n")
-    run_search(factor_type=selected_type)
+    
+    if args.type:
+        selected_type = args.type
+        print(f"已指定因子类型: {selected_type}\n")
+    else:
+        print("请选择您想生成的初始Alpha因子类型:")
+        for key, value in factor_menu.items():
+            print(f"  {key}: {value}")
+        choice = input("请输入选项编号 (默认为7): ")
+        selected_type = factor_menu.get(choice, factor_menu["7"])
+        print(f"\n好的, 已选择生成: {selected_type}\n")
+    
+    run_search(factor_type=selected_type, budget=args.budget, threshold=args.threshold)
+

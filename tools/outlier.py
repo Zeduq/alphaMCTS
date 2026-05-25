@@ -1,5 +1,3 @@
-
-
 class Outlier:
 
     def __init__(self):

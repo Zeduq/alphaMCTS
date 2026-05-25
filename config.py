@@ -1,11 +1,3 @@
-"""
-AlphaMCTS 全局配置
-
-使用方法:
-1. 复制 .env.example 为 .env
-2. 填入你的 API Key
-3. 其他配置项可选
-"""
 
 import os
 from pathlib import Path
@@ -13,9 +5,6 @@ from typing import List
 
 
 def load_dotenv_builtin(env_path: Path):
-    """
-    内置的 .env 文件解析器（不依赖 python-dotenv）
-    """
     if not env_path.exists():
         return
     
@@ -55,34 +44,25 @@ except ImportError:
     pass  # 使用内置解析器即可
 
 
-# ==================== 动态配置读取 ====================
 
 # 默认为 'qwen3-max'，如果环境变量里有设置，则使用环境变量
 CURRENT_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE", "qwen3-max")
 
 # 默认为 'prompts_cn'，如果有设置则用设置值
-PROMPT_DIR = os.getenv("PROMPT_DIR", "prompts_cn")
+PROMPT_DIR = os.getenv("PROMPT_DIR", "inference/prompts/cn")
 
 # 数据目录
 DATA_DIR = os.getenv("DATA_DIR", "D:/AAProject/Data")
 
 
 def print_config():
-    """打印当前配置信息（可选调用）"""
     print(f"--- [Config] 当前模型模式: {CURRENT_MODEL_TYPE} | 提示词目录: {PROMPT_DIR} ---")
     print(f"--- [Config] 搜索预算: {INITIAL_SEARCH_BUDGET} | 准入阈值: {EFFECTIVENESS_THRESHOLD} ---")
 
 
-# ==================== 模型与 API 配置 ====================
 
 def get_api_config():
-    """
-    获取API配置
-    
-    Returns:
-        dict: 包含 api_key, base_url, model 的字典
-    """
-    if CURRENT_MODEL_TYPE == "qwen3-max":
+    if CURRENT_MODEL_TYPE in ("qwen3-max", "qwen-turbo"):
         api_key = os.getenv("DASHSCOPE_API_KEY")
         if not api_key:
             raise ValueError(
@@ -92,7 +72,7 @@ def get_api_config():
         return {
             "api_key": api_key,
             "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-            "model": "qwen3-max"
+            "model": CURRENT_MODEL_TYPE
         }
     else:
         api_key = os.getenv("OPENAI_API_KEY")
@@ -109,7 +89,6 @@ def get_api_config():
         }
 
 
-# 向后兼容：尝试加载配置，失败时使用占位值
 try:
     api_config = get_api_config()
     OPENAI_API_KEY = api_config["api_key"]
@@ -123,23 +102,20 @@ except ValueError as e:
     print(f"[Config] 警告: {e}")
 
 
-# ==================== 其他参数 ====================
 
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "1.0"))
 SHOW_DEBATE_LOG = os.getenv("SHOW_DEBATE_LOG", "False").lower() == "true"
 
 
-# ==================== MCTS 参数 ====================
 
 INITIAL_SEARCH_BUDGET = int(os.getenv("INITIAL_SEARCH_BUDGET", "10"))
 BUDGET_INCREMENT = int(os.getenv("BUDGET_INCREMENT", "1"))
 MCTS_EXPLORATION_WEIGHT = float(os.getenv("MCTS_EXPLORATION_WEIGHT", "1.414"))
 
 # 辩论轮数
-DEBATE_ROUNDS = int(os.getenv("DEBATE_ROUNDS", "2"))
+DEBATE_ROUNDS = int(os.getenv("DEBATE_ROUNDS", "1"))
 
 
-# ==================== 评测维度参数 ====================
 
 EFFECTIVENESS_THRESHOLD = float(os.getenv("EFFECTIVENESS_THRESHOLD", "2.0"))
 
@@ -153,7 +129,6 @@ MAX_EVAL_SCORE_PER_DIM = 10.0
 ELITE_Q_THRESHOLD = 5.0
 
 
-# ==================== 数据字段与算子定义 ====================
 
 AVAILABLE_DATA_FIELDS: List[str] = ["open", "high", "low", "close", "volume", "vwap"]
 
@@ -188,7 +163,6 @@ OPERATOR_INPUT_COUNT = {
 }
 
 
-# ==================== 日期配置（实验2） ====================
 
 # 训练期（用于因子挖掘）
 TRAIN_BEGIN = "2017-01-03"
@@ -202,3 +176,4 @@ TEST_END = "2023-06-26"
 if __name__ == "__main__":
     print_config()
     print(f"\nAPI配置: model={LLM_MODEL}, base_url={BASE_URL[:30]}...")
+

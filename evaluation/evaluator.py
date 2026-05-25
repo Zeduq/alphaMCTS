@@ -1,11 +1,3 @@
-"""
-Alpha因子评估器模块
-
-注意: 此模块已重构，使用 Evaluator 类封装所有逻辑。
-为了向后兼容，保留了原函数接口。
-"""
-
-# 导入新的评估器类
 from evaluation.evaluator_class import (
     Evaluator,
     EvaluationMetrics,
@@ -14,11 +6,14 @@ from evaluation.evaluator_class import (
     get_refinement_dimension,
 )
 
-# 导出公共接口
+def evaluate_all_periods(formula):
+    raise NotImplementedError("evaluate_all_periods 需要基于 Evaluator 类实现多周期评估逻辑")
+
 __all__ = [
     'Evaluator',
-    'EvaluationMetrics', 
+    'EvaluationMetrics',
     'simulate_evaluation',
     'get_refinement_dimension',
     'get_default_evaluator',
+    'evaluate_all_periods',
 ]

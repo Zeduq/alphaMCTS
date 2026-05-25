@@ -1,19 +1,3 @@
-"""
-AlphaMCTS 可视化 GUI 系统
-
-功能：
-1. 左侧：交互式 MCTS 搜索树可视化
-   - 实时展示搜索树构建过程
-   - 节点悬停显示详细信息（五维评分、因子画像、公式、Rank IC等）
-   - 支持缩放和平移
-
-2. 右侧：模拟终端
-   - 实时显示运行日志
-   - 支持命令输入
-
-使用方法：
-    python mcts_gui.py
-"""
 
 import sys
 import os
@@ -42,26 +26,19 @@ from PyQt5.QtGui import (
 
 # 导入项目模块
 from config import PROMPT_DIR, INITIAL_SEARCH_BUDGET, EFFECTIVENESS_THRESHOLD
-from mcts.search import MCTS
-from utils.data_structures import AlphaNode, AlphaFormula
+from search.lifecycle import MCTS
+from search.tree import AlphaNode, AlphaFormula
 from utils.exporter import export_elite_factors
-from alpha_library.library import AlphaLibrary
-from agents.portrait_agent import PortraitAgent
-from agents.formula_agent import FormulaAgent
+from constraint.library import AlphaLibrary
+from inference.agents.portrait import PortraitAgent
+from inference.agents.formula import FormulaAgent
 from evaluation.evaluator import simulate_evaluation
-from fsa.fsa_miner import mine_frequent_subtrees
+from constraint.fsa import mine_frequent_subtrees
 
 
-# =============================================================================
 # MCTS 后台工作线程
-# =============================================================================
 
 class MCTSWorker(QObject):
-    """
-    MCTS搜索工作线程
-    
-    在后台线程执行搜索，避免阻塞GUI主线程
-    """
     # 信号定义
     root_node_ready = pyqtSignal(AlphaNode)  # 根节点初始化完成
     iteration_started = pyqtSignal(int, int)  # 当前迭代, 总预算
@@ -80,7 +57,6 @@ class MCTSWorker(QObject):
         self.stop_requested = False
     
     def initialize_root(self, factor_type: str):
-        """初始化根节点"""
         try:
             self.log_message.emit("正在初始化根节点...", "info")
             
@@ -110,7 +86,6 @@ class MCTSWorker(QObject):
             self.search_error.emit(f"初始化失败: {str(e)}")
     
     def run_search(self, budget: int, threshold: int):
-        """运行搜索循环"""
         if not self.mcts:
             self.search_error.emit("MCTS未初始化")
             return
@@ -160,17 +135,13 @@ class MCTSWorker(QObject):
             self.is_running = False
     
     def stop(self):
-        """请求停止搜索"""
         self.stop_requested = True
         self.log_message.emit("正在停止搜索...", "warning")
 
 
-# =============================================================================
 # 树节点图形项
-# =============================================================================
 
 class TreeNodeItem(QGraphicsEllipseItem):
-    """MCTS树节点的可视化图形项"""
     
     def __init__(self, node: AlphaNode, x: float, y: float, radius: float = 25):
         super().__init__(-radius, -radius, radius * 2, radius * 2)
@@ -191,7 +162,6 @@ class TreeNodeItem(QGraphicsEllipseItem):
         self.create_label()
     
     def update_color(self):
-        """根据节点Q值更新颜色"""
         q_value = self.node.q_value if hasattr(self.node, 'q_value') else 0
         
         # Q值映射到颜色：低(红色) -> 高(绿色)
@@ -208,7 +178,6 @@ class TreeNodeItem(QGraphicsEllipseItem):
         self.setPen(QPen(QColor(44, 62, 80), 2))
     
     def create_label(self):
-        """创建节点标签"""
         name = self.node.portrait.get('name', 'Unknown')[:8]
         self.label = QGraphicsTextItem(name, self)
         self.label.setFont(QFont("Microsoft YaHei", 8))
@@ -219,18 +188,15 @@ class TreeNodeItem(QGraphicsEllipseItem):
         self.label.setPos(-text_rect.width() / 2, -text_rect.height() / 2)
     
     def hoverEnterEvent(self, event):
-        """鼠标悬停进入事件"""
         self.setPen(QPen(QColor(52, 152, 219), 4))
         self.show_tooltip()
         super().hoverEnterEvent(event)
     
     def hoverLeaveEvent(self, event):
-        """鼠标悬停离开事件"""
         self.setPen(QPen(QColor(44, 62, 80), 2))
         super().hoverLeaveEvent(event)
     
     def show_tooltip(self):
-        """显示节点详细信息"""
         # 构建提示信息
         tooltip_text = self.build_tooltip_text()
         QToolTip.showText(
@@ -242,7 +208,6 @@ class TreeNodeItem(QGraphicsEllipseItem):
         )
     
     def build_tooltip_text(self) -> str:
-        """构建节点详细信息文本"""
         lines = []
         lines.append("<h3>🎯 节点详情</h3>")
         
@@ -281,7 +246,6 @@ class TreeNodeItem(QGraphicsEllipseItem):
 
 
 class TreeEdgeItem(QGraphicsLineItem):
-    """树边的可视化图形项"""
     
     def __init__(self, parent_node: TreeNodeItem, child_node: TreeNodeItem):
         # 计算起点和终点
@@ -297,18 +261,14 @@ class TreeEdgeItem(QGraphicsLineItem):
         self.child_node = child_node
     
     def update_position(self):
-        """更新边的位置（当节点移动时）"""
         parent_pos = self.parent_node.scenePos()
         child_pos = self.child_node.scenePos()
         self.setLine(parent_pos.x(), parent_pos.y(), child_pos.x(), child_pos.y())
 
 
-# =============================================================================
 # 搜索树场景
-# =============================================================================
 
 class MCTSTreeScene(QGraphicsScene):
-    """MCTS搜索树场景"""
     
     node_clicked = pyqtSignal(AlphaNode)
     
@@ -321,13 +281,11 @@ class MCTSTreeScene(QGraphicsScene):
         self.node_spacing = 100  # 节点间距
     
     def clear_tree(self):
-        """清空树"""
         self.clear()
         self.node_items.clear()
         self.edge_items.clear()
     
     def add_node(self, node: AlphaNode, parent_item: Optional[TreeNodeItem] = None):
-        """添加节点到场景"""
         # 计算节点位置
         x, y = self.calculate_node_position(node, parent_item)
         
@@ -347,21 +305,22 @@ class MCTSTreeScene(QGraphicsScene):
         return node_item
     
     def calculate_node_position(self, node: AlphaNode, parent_item: Optional[TreeNodeItem]) -> tuple:
-        """计算节点位置"""
         if parent_item is None:
             # 根节点居中
             return 0, 50
         
-        # 根据深度和兄弟节点数量计算位置
+        # 根据深度和当前父节点的已有子节点数量计算位置
         depth = self.get_node_depth(node)
         y = depth * self.level_height
         
-        # 简单的水平布局
+        # 只统计当前父节点已绘制的子节点数，避免不同父节点的子节点重叠
         parent_x = parent_item.x()
-        sibling_count = len([c for c in self.node_items.values() 
-                            if abs(c.y() - y) < 10])  # 同层级节点数
+        sibling_count = sum(
+            1 for edge in self.edge_items
+            if edge.parent_node is parent_item
+        )
         
-        # 在父节点两侧分布
+        # 在父节点两侧交替分布
         if sibling_count % 2 == 0:
             x = parent_x + (sibling_count + 1) * self.node_spacing / 2
         else:
@@ -370,7 +329,6 @@ class MCTSTreeScene(QGraphicsScene):
         return x, y
     
     def get_node_depth(self, node: AlphaNode) -> int:
-        """获取节点深度"""
         depth = 0
         current = node
         while current.parent:
@@ -379,17 +337,13 @@ class MCTSTreeScene(QGraphicsScene):
         return depth
     
     def update_tree_layout(self):
-        """更新树的布局（重新计算位置）"""
         # 这里可以实现更复杂的树布局算法
         pass
 
 
-# =============================================================================
 # 终端模拟器
-# =============================================================================
 
 class TerminalWidget(QTextEdit):
-    """模拟终端的文本显示组件"""
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -412,7 +366,6 @@ class TerminalWidget(QTextEdit):
         self.max_lines = 1000
     
     def append_log(self, text: str, log_type: str = "info"):
-        """添加日志"""
         # 根据类型设置颜色
         colors = {
             "info": "#d4d4d4",
@@ -437,7 +390,6 @@ class TerminalWidget(QTextEdit):
         scrollbar.setValue(scrollbar.maximum())
     
     def limit_lines(self):
-        """限制最大行数"""
         doc = self.document()
         if doc.blockCount() > self.max_lines:
             cursor = self.textCursor()
@@ -447,12 +399,9 @@ class TerminalWidget(QTextEdit):
             cursor.deleteChar()
 
 
-# =============================================================================
 # 节点详情面板
-# =============================================================================
 
 class NodeDetailPanel(QGroupBox):
-    """节点详细信息面板"""
     
     def __init__(self, parent=None):
         super().__init__("节点详情", parent)
@@ -504,7 +453,6 @@ class NodeDetailPanel(QGroupBox):
         layout.addRow("<b>描述:</b>", self.desc_label)
     
     def update_node(self, node: AlphaNode):
-        """更新显示的节点信息"""
         if not node:
             return
         
@@ -554,12 +502,9 @@ class NodeDetailPanel(QGroupBox):
         self.desc_label.setText(node.portrait.get('description', '无描述'))
 
 
-# =============================================================================
 # 控制面板
-# =============================================================================
 
 class ControlPanel(QGroupBox):
-    """控制面板"""
     
     start_search = pyqtSignal(str, int, int)  # factor_type, budget, threshold
     stop_search = pyqtSignal()
@@ -653,7 +598,6 @@ class ControlPanel(QGroupBox):
         layout.addWidget(self.status_label)
     
     def on_start(self):
-        """开始搜索"""
         factor_type = self.factor_type_combo.currentText()
         budget = self.budget_spin.value()
         threshold = self.threshold_spin.value()
@@ -665,30 +609,24 @@ class ControlPanel(QGroupBox):
         self.start_search.emit(factor_type, budget, threshold)
     
     def on_stop(self):
-        """停止搜索"""
         self.stop_search.emit()
         self.start_btn.setEnabled(True)
         self.stop_btn.setEnabled(False)
         self.status_label.setText("已停止")
     
     def update_progress(self, value: int):
-        """更新进度"""
         self.progress_bar.setValue(value)
     
     def reset_state(self):
-        """重置状态"""
         self.start_btn.setEnabled(True)
         self.stop_btn.setEnabled(False)
         self.status_label.setText("就绪")
         self.progress_bar.setValue(0)
 
 
-# =============================================================================
 # 主窗口
-# =============================================================================
 
 class MCTSMainWindow(QMainWindow):
-    """MCTS可视化主窗口"""
     
     def __init__(self):
         super().__init__()
@@ -720,7 +658,6 @@ class MCTSMainWindow(QMainWindow):
         self.node_items_map = {}
     
     def setup_worker_connections(self):
-        """设置工作线程信号连接"""
         # 工作线程 -> GUI
         self.worker.root_node_ready.connect(self.on_root_node_ready)
         self.worker.iteration_started.connect(self.on_iteration_started)
@@ -732,11 +669,9 @@ class MCTSMainWindow(QMainWindow):
         self.worker.log_message.connect(self.on_worker_log)
     
     def on_worker_log(self, text: str, log_type: str):
-        """处理工作线程日志"""
         self.terminal.append_log(text, log_type)
     
     def on_root_node_ready(self, root_node: AlphaNode):
-        """根节点就绪"""
         self.mcts = self.worker.mcts
         self.alpha_repo = self.worker.alpha_repo
         
@@ -752,13 +687,11 @@ class MCTSMainWindow(QMainWindow):
         self.graphics_view.viewport().update()
     
     def on_iteration_started(self, current: int, total: int):
-        """迭代开始"""
         self.current_iteration = current
         progress = int((current / total) * 100)
         self.control_panel.update_progress(progress)
     
     def on_node_expanded(self, parent_node: AlphaNode, new_node: AlphaNode):
-        """节点扩展完成"""
         # 找到父节点图形项
         parent_item = self.node_items_map.get(id(parent_node))
         
@@ -773,33 +706,28 @@ class MCTSMainWindow(QMainWindow):
         self.node_detail.update_node(new_node)
     
     def on_node_evaluated(self, node: AlphaNode):
-        """节点评估完成"""
         # 更新节点显示（评估后可能有新的Q值）
         if id(node) in self.node_items_map:
             self.node_items_map[id(node)].update_color()
         self.graphics_view.viewport().update()
     
     def on_backprop_done(self, node: AlphaNode):
-        """反向传播完成"""
         # 更新节点颜色（Q值可能已改变）
         if id(node) in self.node_items_map:
             self.node_items_map[id(node)].update_color()
         self.graphics_view.viewport().update()
     
     def on_search_finished(self):
-        """搜索完成"""
         self.terminal.append_log("搜索完成!", "success")
         self.control_panel.reset_state()
         self.status_bar.showMessage(f"搜索完成 | 共发现 {len(self.alpha_repo)} 个优质因子")
     
     def on_search_error(self, error_msg: str):
-        """搜索错误"""
         self.terminal.append_log(error_msg, "error")
         QMessageBox.critical(self, "搜索错误", error_msg)
         self.control_panel.reset_state()
     
     class StdoutRedirector:
-        """标准输出重定向器"""
         def __init__(self, terminal: TerminalWidget):
             self.terminal = terminal
         
@@ -811,7 +739,6 @@ class MCTSMainWindow(QMainWindow):
             pass
     
     def setup_ui(self):
-        """设置UI"""
         # 中央部件
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -874,7 +801,6 @@ class MCTSMainWindow(QMainWindow):
         self.status_bar.showMessage("就绪")
     
     def setup_connections(self):
-        """设置信号连接"""
         self.control_panel.start_search.connect(self.start_mcts_search)
         self.control_panel.stop_search.connect(self.stop_mcts_search)
         self.control_panel.clear_tree.connect(self.clear_tree)
@@ -883,7 +809,6 @@ class MCTSMainWindow(QMainWindow):
         self.tree_scene.node_clicked.connect(self.on_node_clicked)
     
     def start_mcts_search(self, factor_type: str, budget: int, threshold: int):
-        """开始MCTS搜索"""
         self.terminal.append_log(f"开始搜索: 类型={factor_type}, 预算={budget}, 阈值={threshold}", "info")
         
         # 清空之前的树
@@ -910,18 +835,15 @@ class MCTSMainWindow(QMainWindow):
         QTimer.singleShot(100, lambda: self.worker.initialize_root(factor_type))
     
     def start_search_loop(self, budget: int, threshold: int):
-        """开始搜索循环"""
         self.status_bar.showMessage(f"搜索中... (0/{budget})")
         # 在工作线程中运行搜索
         QTimer.singleShot(100, lambda: self.worker.run_search(budget, threshold))
     
     def stop_mcts_search(self):
-        """停止搜索"""
         self.worker.stop()
         self.terminal.append_log("正在停止...", "warning")
     
     def closeEvent(self, event):
-        """关闭事件"""
         # 停止工作线程
         self.worker.stop()
         self.worker_thread.quit()
@@ -931,13 +853,11 @@ class MCTSMainWindow(QMainWindow):
         event.accept()
     
     def clear_tree(self):
-        """清空树"""
         self.tree_scene.clear_tree()
         self.graphics_view.viewport().update()
         self.terminal.append_log("树已清空", "info")
     
     def export_results(self):
-        """导出结果"""
         if not self.alpha_repo.alphas:
             QMessageBox.warning(self, "警告", "没有可导出的结果")
             return
@@ -951,22 +871,11 @@ class MCTSMainWindow(QMainWindow):
             self.terminal.append_log(f"结果已导出到: {filename}", "success")
     
     def on_node_clicked(self, node: AlphaNode):
-        """节点点击事件"""
         self.node_detail.update_node(node)
     
-    def closeEvent(self, event):
-        """关闭事件"""
-        # 恢复stdout
-        sys.stdout = self.original_stdout
-        event.accept()
-
-
-# =============================================================================
 # 入口
-# =============================================================================
 
 def main():
-    """主函数"""
     app = QApplication(sys.argv)
     
     # 设置应用样式

@@ -66,3 +66,4 @@ class RandomForestStrategy(Strategy):
 
         # 更新投资组合持仓权重
         self.rebalance(cash_reserve=0.1)
+

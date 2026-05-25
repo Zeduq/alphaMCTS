@@ -5,9 +5,6 @@ from datetime import datetime
 
 
 def export_elite_factors(elite_factors, mode="debate", save_dir="results"):
-    """
-    将入库的优质因子导出为 JSON 和 CSV (双轨制包含所有指标)
-    """
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -29,7 +26,6 @@ def export_elite_factors(elite_factors, mode="debate", save_dir="results"):
         metrics = getattr(node, 'financial_metrics', {})
         scores = getattr(node, 'scores', {})
 
-        # 1. 构建 JSON 全量字典 (👉 新增了详细的 Financial_Metrics 字典)
         json_data.append({
             "Rank": rank + 1,
             "Node_ID": getattr(node, 'node_id', f"node_{rank}"),
@@ -50,7 +46,6 @@ def export_elite_factors(elite_factors, mode="debate", save_dir="results"):
             "Q_Value": round(getattr(node, 'q_value', 0.0), 4)
         })
 
-        # 2. 构建 CSV 扁平字典 (👉 确保包含 Normal_IC_Mean)
         csv_data.append({
             "Rank": rank + 1,
             "Factor_ID": getattr(node, 'node_id', f"node_{rank}"),
@@ -79,3 +74,4 @@ def export_elite_factors(elite_factors, mode="debate", save_dir="results"):
 
     print(f"\n✅ [{mode.upper()} 模式] 挖掘完毕！共双轨式保存 {len(elite_factors)} 个入库因子。")
     print(f"📄 JSON: {json_path}\n📊 CSV: {csv_path}\n")
+

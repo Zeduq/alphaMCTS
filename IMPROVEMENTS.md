@@ -214,7 +214,7 @@ python -c "from config import *; print('Config OK')"
 python -c "from evaluation.evaluator import Evaluator; e = Evaluator(); print('Evaluator OK')"
 
 # 测试 MCTS
-python -c "from mcts.search import MCTS; print('MCTS OK')"
+python -c "from search.lifecycle import MCTS; print('MCTS OK')"
 
 # 运行主程序测试（短预算）
 python main.py

@@ -1,12 +1,3 @@
-"""
-改进的评估器模块 - 使用类封装消除全局状态
-
-主要改进：
-1. 使用 Evaluator 类封装所有评估逻辑
-2. 支持缓存机制避免重复计算
-3. 更好的错误处理和日志记录
-4. 支持训练/测试期数据分离
-"""
 
 import numpy as np
 import pandas as pd
@@ -27,10 +18,10 @@ except ImportError:
 except Exception:
     ALPHALENS_AVAILABLE = False
 
-from utils.data_structures import AlphaFormula, AlphaNode
-from agents.critic_agent import CriticAgent
+from search.tree import AlphaFormula, AlphaNode
+from inference.agents.critic import CriticAgent
 from factor_calculator import FactorCalculator
-from alpha_library.library import AlphaLibrary
+from constraint.library import AlphaLibrary
 from config import (
     MAX_EVAL_SCORE_PER_DIM, EVAL_TEMP, PROMPT_DIR, 
     DATA_DIR
@@ -49,7 +40,6 @@ except Exception:
 
 @dataclass
 class EvaluationMetrics:
-    """评估指标数据类"""
     rank_ic_mean: float = 0.0
     rank_ic_std: float = 0.0
     icir: float = 0.0
@@ -62,11 +52,6 @@ class EvaluationMetrics:
 
 
 class Evaluator:
-    """
-    Alpha因子评估器
-    
-    封装所有评估逻辑，消除全局状态，支持缓存机制
-    """
     
     def __init__(self, 
                  data_dir: str = DATA_DIR,
@@ -75,17 +60,6 @@ class Evaluator:
                  test_begin: str = '2022-06-27',
                  test_end: str = '2023-06-26',
                  holding_period: int = 5):
-        """
-        初始化评估器
-        
-        Args:
-            data_dir: 数据目录路径
-            train_begin: 训练期开始日期
-            train_end: 训练期结束日期
-            test_begin: 测试期开始日期
-            test_end: 测试期结束日期
-            holding_period: 默认持仓周期
-        """
         self.data_dir = data_dir
         self.train_begin = train_begin
         self.train_end = train_end
@@ -122,7 +96,6 @@ class Evaluator:
         self._load_auxiliary_data()
     
     def _load_auxiliary_data(self):
-        """加载基准数据和 Alpha101 数据"""
         print("--- [Evaluator] 正在加载辅助评估数据 ---")
         
         # 加载基准指数 (HS300 Index)
@@ -151,21 +124,10 @@ class Evaluator:
             print(f"[FAIL] Alpha101 数据加载失败: {e}")
     
     def clear_cache(self):
-        """清除因子计算缓存"""
         self._factor_cache.clear()
         print("[Evaluator] 缓存已清除")
     
     def calculate_factor(self, formula_str: str, use_cache: bool = True) -> Optional[pd.Series]:
-        """
-        计算因子值（带缓存）
-        
-        Args:
-            formula_str: 因子公式字符串
-            use_cache: 是否使用缓存
-            
-        Returns:
-            因子值的Series，计算失败返回None
-        """
         cache_key = formula_str
         
         if use_cache and cache_key in self._factor_cache:
@@ -184,7 +146,6 @@ class Evaluator:
             return None
     
     def get_refinement_dimension(self, scores: Dict[str, float]) -> str:
-        """根据分数选择需要优化的维度"""
         refinable_dims = {k: v for k, v in scores.items() if k != "Overfitting Risk"}
         if not refinable_dims:
             return random.choice(list(scores.keys()))
@@ -195,7 +156,6 @@ class Evaluator:
         return np.random.choice(list(refinable_dims.keys()), p=probabilities)
     
     def _get_refinement_history(self, node: AlphaNode) -> str:
-        """获取节点的优化历史"""
         history: List[str] = []
         curr = node
         while curr:
@@ -205,11 +165,6 @@ class Evaluator:
     
     def calculate_diversity_score(self, new_factor_stacked: pd.Series, 
                                   alpha_repo: AlphaLibrary) -> float:
-        """
-        计算多样性分数
-        
-        如果与现有因子库或 Alpha101 高度相关，则得分低
-        """
         if new_factor_stacked is None or new_factor_stacked.empty:
             return MAX_EVAL_SCORE_PER_DIM
         
@@ -288,7 +243,6 @@ class Evaluator:
     def calculate_manual_metrics(self, factor_data: pd.Series, 
                                  prices: pd.DataFrame, 
                                  period: int = 5) -> Optional[Dict[str, float]]:
-        """手动计算指标 (Plan B)"""
         try:
             # 格式清洗
             if isinstance(factor_data, pd.DataFrame):
@@ -301,7 +255,7 @@ class Evaluator:
                 return None
             
             # 计算未来收益率
-            fwd_ret = prices.pct_change(period).shift(-period)
+            fwd_ret = prices.pct_change(period, fill_method=None).shift(-period)
             
             # 对齐
             common_idx = factor_df.index.intersection(fwd_ret.index)
@@ -312,14 +266,15 @@ class Evaluator:
             factor_df = factor_df.loc[common_idx, common_cols]
             fwd_ret = fwd_ret.loc[common_idx, common_cols]
             
-            # Rank IC
-            ic_series = factor_df.corrwith(fwd_ret, axis=1, method='spearman')
+            # Rank IC (忽略常数输入警告)
+            import warnings
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                ic_series = factor_df.corrwith(fwd_ret, axis=1, method='spearman')
+                autocorr_series = factor_df.corrwith(factor_df.shift(1), axis=1, method='spearman')
             rank_ic_mean = ic_series.mean()
             rank_ic_std = ic_series.std()
             icir = rank_ic_mean / rank_ic_std if rank_ic_std != 0 else 0
-            
-            # 换手率（基于因子自相关性）
-            autocorr_series = factor_df.corrwith(factor_df.shift(1), axis=1, method='spearman')
             mean_autocorr = autocorr_series.dropna().mean()
             estimated_turnover = 1.0 - max(0, mean_autocorr) if not np.isnan(mean_autocorr) else 1.0
             
@@ -384,7 +339,6 @@ class Evaluator:
             return None
     
     def _calculate_excess_stats(self, strategy_ret_series: pd.Series) -> Tuple[float, float]:
-        """计算相对于基准的超额收益指标"""
         if strategy_ret_series.empty or self._benchmark_ret is None:
             return 0.0, 0.0
         
@@ -408,7 +362,6 @@ class Evaluator:
         return ann_excess_ret, ir
     
     def get_alphalens_metrics(self, factor_data: pd.Series) -> Optional[Dict[str, float]]:
-        """使用 Alphalens 计算指标"""
         if not ALPHALENS_AVAILABLE:
             return self.calculate_manual_metrics(factor_data, self.prices, self.holding_period)
         
@@ -448,7 +401,6 @@ class Evaluator:
     
     def _calculate_from_clean_data(self, factor_data_clean: pd.DataFrame, 
                                    period_str: str) -> Optional[Dict[str, float]]:
-        """从 Alphalens 清洗后的数据计算指标"""
         try:
             # IC
             def src_ic(group):
@@ -504,17 +456,6 @@ class Evaluator:
     
     def evaluate(self, formula: AlphaFormula, node: AlphaNode, 
                  alpha_repo: AlphaLibrary) -> Dict[str, float]:
-        """
-        核心评估函数
-        
-        Args:
-            formula: Alpha公式
-            node: Alpha节点
-            alpha_repo: Alpha库
-            
-        Returns:
-            五维评分字典
-        """
         scores: Dict[str, float] = {}
         formula_str = formula.to_expression_string()
         
@@ -581,30 +522,23 @@ class Evaluator:
         return scores
 
 
-# 向后兼容：创建默认评估器实例
 _default_evaluator: Optional[Evaluator] = None
 
 
 def get_default_evaluator() -> Evaluator:
-    """获取默认评估器实例（单例模式）"""
     global _default_evaluator
     if _default_evaluator is None:
         _default_evaluator = Evaluator()
     return _default_evaluator
 
 
-def simulate_evaluation(formula: AlphaFormula, node: AlphaNode, 
+def simulate_evaluation(formula: AlphaFormula, node: AlphaNode,
                         alpha_repo: AlphaLibrary) -> Dict[str, float]:
-    """
-    向后兼容的评估函数
-    
-    使用默认评估器实例进行评估
-    """
     evaluator = get_default_evaluator()
     return evaluator.evaluate(formula, node, alpha_repo)
 
 
 def get_refinement_dimension(scores: Dict[str, float]) -> str:
-    """向后兼容的函数"""
     evaluator = get_default_evaluator()
     return evaluator.get_refinement_dimension(scores)
+

@@ -1,0 +1,25 @@
+==================== RUN START: 2026-05-14 02:42:02 ====================
+Factor Type: 不指定类型
+--- Alpha 1 ---
+Name: volume_weighted_price_reversal
+Q-Value: 5.6880
+In Library: No
+Formula: rank(decay_linear(((close - vwap) / ts_std(close, 20)), 10))
+Scores: {"Effectiveness": 0.34, "Stability": 0.18, "Turnover": 9.92, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.003390544297467601, "rank_ic_std": 0.19368898716124136, "icir": 0.017505095912577907, "turnover": 0.0075255139403610505, "annualized_return": -0.12184031821937824, "sharpe_ratio": -0.6560765832574417, "max_drawdown": -0.9878926337327306, "excess_return": -0.6566962450289439, "information_ratio": -1.3281986390232658}
+--- Alpha 2 ---
+Name: volume_weighted_price_reversal_enhanced
+Q-Value: 5.4820
+In Library: No
+Formula: rank(decay_linear((((close - vwap) / ts_std(close, 20)) * (ts_rank(volume, 10) * sign((ts_argmax(high, 15) - ts_argmin(low, 15))))), 5))
+Scores: {"Effectiveness": 0.18, "Stability": 0.13, "Turnover": 9.1, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": 0.0017612505007944164, "rank_ic_std": 0.13975235587984133, "icir": 0.012602653384310275, "turnover": 0.09004968885127984, "annualized_return": 0.019624126968053046, "sharpe_ratio": 0.22077341833073866, "max_drawdown": -0.7125078383561758, "excess_return": 0.23696922130382564, "information_ratio": 0.6166510952841349}
+--- Alpha 3 ---
+Name: volume_weighted_price_reversal
+Q-Value: 5.5720
+In Library: No
+Formula: rank(decay_linear(ts_rank(((close - vwap) / ts_std(vwap, 20)), 10), 5))
+Scores: {"Effectiveness": 0.33, "Stability": 0.31, "Turnover": 9.22, "Diversity": 10.0, "Overfitting Risk": 8.0}
+Financial Metrics: {"rank_ic_mean": -0.0033242540147884084, "rank_ic_std": 0.1062209619820967, "icir": -0.03129564967928556, "turnover": 0.0777327617342618, "annualized_return": -0.0439477721099375, "sharpe_ratio": -0.38148214792505003, "max_drawdown": -0.7697459992429339, "excess_return": -0.38909851835276565, "information_ratio": -1.1602977395590488}
+==================== RUN END ====================
+

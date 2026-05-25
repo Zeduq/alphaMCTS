@@ -4,10 +4,7 @@ import pandas as pd
 from scipy.stats import rankdata
 
 
-# --- 核心算子函数 ---
-
 def safe_log(df):
-    """自定义的安全log函数，处理非正数。"""
     # 替换 0 或 负数 为 NaN，或者截断
     # 这里选择截断到一个极小正数，防止 log 报错
     epsilon = 1e-10
@@ -80,11 +77,6 @@ def rank(df):
 
 
 def scale(df, k=1):
-    """
-    截面缩放 (Cross-Sectional Scale)
-    使每天的因子绝对值之和为 k (默认1)。
-    修复了原版中使用 sum(axis=0) 导致的未来函数和 Series 比较报错。
-    """
     # axis=1: 按行（每天）求绝对值之和
     daily_abs_sum = np.abs(df).sum(axis=1)
 
@@ -144,7 +136,6 @@ DEFAULT_FUNCS = {
 }
 
 
-# --- 公式解析器 ---
 class FormulaParser:
     TOKEN_SPEC = [
         ('NUMBER', r'\d+(\.\d+)?'),
@@ -261,7 +252,6 @@ class FormulaParser:
         raise NameError(f'Unknown function: {name}')
 
 
-# --- 因子计算器封装类 ---
 class FactorCalculator:
     def __init__(self, data_path: str = 'D:/AAProject/Data/000300SH.csv',
                  begin_date: str = '2017-01-01', end_date: str = '2023-06-26',
@@ -318,3 +308,4 @@ class FactorCalculator:
         except Exception as e:
             print(f"错误: 因子计算失败 for formula: {formula_str}\nError details: {e}")
             return None
+

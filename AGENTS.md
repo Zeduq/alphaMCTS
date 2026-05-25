@@ -29,48 +29,48 @@ AlphaMCTS 是一个基于蒙特卡洛树搜索（MCTS）和多智能体辩论机
 
 ```
 alphaMCTS/
-├── agents/                 # LLM 智能体模块
-│   ├── base_agent.py       # 智能体抽象基类
-│   ├── portrait_agent.py   # Alpha 画像生成智能体
-│   ├── formula_agent.py    # 公式翻译智能体
-│   ├── debate_agent.py     # 辩论智能体
-│   ├── synthesizer_agent.py # 辩论结果合成智能体
-│   ├── critic_agent.py     # 过拟合评估智能体
-│   └── refiner_agent.py    # 因子优化智能体（消融实验用）
-├── mcts/                   # MCTS 搜索核心
-│   └── search.py           # MCTS 实现（选择、扩展、反向传播）
+├── search/                 # 搜索模块：树的建模、生命周期管理
+│   ├── tree.py             # AlphaFormula, AlphaNode 数据结构
+│   └── lifecycle.py        # MCTS 实现（选择、扩展、反向传播）
+├── constraint/             # 约束模块：FSA 规避、因子库维护
+│   ├── fsa.py              # 频繁子树挖掘
+│   └── library.py          # AlphaLibrary 有效因子存储与管理
+├── inference/              # 推理模块：智能体协作规范与实现
+│   ├── agents/             # LLM 智能体
+│   │   ├── base.py         # 智能体抽象基类
+│   │   ├── portrait.py     # Alpha 画像生成智能体
+│   │   ├── formula.py      # 公式翻译智能体
+│   │   ├── debate.py       # 辩论智能体
+│   │   ├── synthesizer.py  # 辩论结果合成智能体
+│   │   ├── critic.py       # 过拟合评估智能体
+│   │   └── refiner.py      # 因子优化智能体（消融实验用）
+│   └── prompts/            # 提示词模板
+│       ├── en/             # 英文提示词
+│       └── cn/             # 中文提示词
 ├── evaluation/             # 评估模块
-│   └── evaluator.py        # 因子回测与五维评分
-├── alpha_library/          # Alpha 因子库
-│   └── library.py          # 有效因子存储与管理
-├── fsa/                    # 频繁子树分析
-│   └── fsa_miner.py        # 提取并统计常见子树结构
+│   ├── evaluator.py        # 兼容层
+│   └── evaluator_class.py  # 因子回测与五维评分核心实现
 ├── utils/                  # 工具模块
-│   ├── data_structures.py  # AlphaFormula, AlphaNode 数据结构
+│   ├── data_structures.py  # 兼容层（重新导出 search.tree）
 │   └── exporter.py         # 结果导出（JSON/CSV 双轨制）
 ├── tools/                  # 数据预处理工具（部分实现）
 │   ├── select.py, scale.py, neutralize.py, label.py
 │   ├── encode.py, balance.py, outlier.py, miss.py
-├── prompts/                # 英文提示词模板
-│   ├── portrait_generation.txt
-│   ├── formula_generation.txt
-│   ├── debate_turn.txt
-│   ├── debate_synthesis.txt
-│   └── overfitting_assessment.txt
-├── prompts_cn/             # 中文提示词模板（同上）
+├── experiments/            # 实验脚本
+│   ├── run_experiment.py   # 2x2 对照实验运行器
+│   ├── run_ablation.py     # 消融实验（refiner vs debate）
+│   ├── run_fsa_experiment.py # FSA 机制消融实验
+│   ├── run_gp_baseline.py  # 遗传规划基线对比
+│   ├── analyze_results.py  # 实验结果可视化分析
+│   ├── compare_results.py  # 新旧版本对比分析
+│   ├── recalculate_metrics.py # 指标重新计算工具
+│   └── convert_txt_to_json.py # 结果格式转换工具
 ├── trade-learn-master/     # 内嵌回测框架
 ├── config.py               # 全局配置（模型、API、参数）
 ├── main.py                 # 主程序入口
 ├── factor_calculator.py    # 因子计算公式解析与计算
 ├── strategy.py             # 回测策略定义
-├── run_experiment.py       # 2x2 对照实验运行器
-├── run_ablation.py         # 消融实验（refiner vs debate）
-├── run_fsa_experiment.py   # FSA 机制消融实验
-├── run_gp_baseline.py      # 遗传规划基线对比
-├── analyze_results.py      # 实验结果可视化分析
-├── compare_results.py      # 新旧版本对比分析
-├── recalculate_metrics.py  # 指标重新计算工具
-└── convert_txt_to_json.py  # 结果格式转换工具
+└── mcts_gui.py             # 可视化 GUI 系统
 ```
 
 ## 配置说明
@@ -82,7 +82,7 @@ alphaMCTS/
 ```python
 # 模型配置（通过环境变量动态切换）
 CURRENT_MODEL_TYPE = os.getenv("LLM_MODEL_TYPE", "qwen3-max")  # 或 "gpt-4o"
-PROMPT_DIR = os.getenv("PROMPT_DIR", "prompts_cn")  # 或 "prompts"
+PROMPT_DIR = os.getenv("PROMPT_DIR", "inference/prompts/cn")  # 或 "inference/prompts/en"
 
 # API 配置（需填入有效 API Key）
 OPENAI_API_KEY = "your-api-key"
@@ -135,7 +135,7 @@ python main.py
 ### 2. 2x2 对照实验
 
 ```bash
-python run_experiment.py
+python experiments/run_experiment.py
 ```
 
 自动运行 4 组实验：
@@ -148,23 +148,23 @@ python run_experiment.py
 
 ```bash
 # Refiner 模式（单智能体优化）
-python run_ablation.py
+python experiments/run_ablation.py
 
 # FSA 机制对比
-python run_fsa_experiment.py
+python experiments/run_fsa_experiment.py
 ```
 
 ### 4. 结果分析
 
 ```bash
 # 生成对比图表
-python analyze_results.py
+python experiments/analyze_results.py
 
 # 新旧版本对比
-python compare_results.py
+python experiments/compare_results.py
 
 # 重新计算指标
-python recalculate_metrics.py
+python experiments/recalculate_metrics.py
 ```
 
 ## 代码规范
@@ -318,7 +318,7 @@ class AlphaNode:
 
 1. 继承 `BaseAgent`
 2. 实现 `execute(**kwargs)` 方法
-3. 在 `prompts/` 和 `prompts_cn/` 中添加对应提示词文件
+3. 在 `inference/prompts/en/` 和 `inference/prompts/cn/` 中添加对应提示词文件
 
 ### 添加新的算子
 

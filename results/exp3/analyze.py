@@ -7,7 +7,6 @@ plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei', 'Arial Unicode M
 plt.rcParams['axes.unicode_minus'] = False
 
 def parse_md_table(md_text, section_name):
-    """从MD文本中提取特定section的表格数据"""
     pattern = f"\\*\\*{section_name}\\*\\*.*?\\n\\n(.*?)(?=\\n\\n\\*\\*|\\Z)"
     match = re.search(pattern, md_text, re.DOTALL)
     if not match:
